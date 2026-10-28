@@ -1,0 +1,22 @@
+{
+  "name": "ai-cost-calculator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Calculator for running AI on your own hardware: cost per head and token rate, as a single HTML file without a server",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NeoGeoOne/ai-cost-calculator.git"
+  },
+  "author": "NeoGeoOne",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\"",
+    "check": "prettier --check .",
+    "format": "prettier --write .",
+    "browser": "playwright install chromium"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1",
+    "prettier": "3.6.2"
+  }
+}

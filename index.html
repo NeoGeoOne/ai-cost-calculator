@@ -1,0 +1,4800 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Eigene KI: Kosten und Hardware verstehen</title>
+    <meta
+      name="description"
+      content="Zwei Rechner in einer Datei, ohne Server und Anmeldung: Was kostet eigene KI-Hardware für ein Unternehmen, und wie schnell läuft welches Modell auf welchem Gerät."
+    />
+    <meta property="og:title" content="Eigene KI: Kosten und Hardware verstehen" />
+    <meta
+      property="og:description"
+      content="Kostenloser Rechner: Hardware, Kosten pro Mitarbeiter, Cloud-Vergleich und Token-Rate je Gerät und Modell."
+    />
+    <style>
+      :root {
+        --n: #12305a;
+        --g: #2f9a6a;
+        --g2: #e6f4ec;
+        --bg: #f5f7fa;
+        --panel: #fff;
+        --ink: #1c2430;
+        --mute: #5a6676;
+        --line: #dbe2ea;
+        --soft: #eef3f8;
+        --warn: #b5462f;
+        --warnSoft: #fbeae5;
+        --r: 14px;
+        /* Text on blue (--n) and green backgrounds; the green behind text is a little darker than the --g accent */
+        --onN: #fff;
+        --onG: #fff;
+        --gInk: #237c55;
+        /* Functional colors of the technical view: memory, compute units, system RAM, KV cache */
+        --mem: #3b6fd8;
+        --memSoft: #e3ecfc;
+        --comp: #e0782f;
+        --compSoft: #fcebdd;
+        --ram: #8a63c9;
+        --ramSoft: #efe7f9;
+        --kv: #1f9c9c;
+        --ok: #2f9a6a;
+        --ssd: #7c7a72;
+        --draft: #c08a00;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --n: #9dbcee;
+          --g: #4cc28c;
+          --g2: #18322a;
+          --bg: #10141a;
+          --panel: #19202a;
+          --ink: #e8edf3;
+          --mute: #9aa6b5;
+          --line: #2c3542;
+          --soft: #1f2834;
+          --warn: #e88b74;
+          --warnSoft: #3a221c;
+          --onN: #10141a;
+          --onG: #10141a;
+          --gInk: #4cc28c;
+          --memSoft: #1c2943;
+          --compSoft: #3b2717;
+          --ramSoft: #2a2140;
+          --ok: #4cc28c;
+          --ssd: #8f8d85;
+        }
+      }
+      :root[data-theme='dark'] {
+        --n: #9dbcee;
+        --g: #4cc28c;
+        --g2: #18322a;
+        --bg: #10141a;
+        --panel: #19202a;
+        --ink: #e8edf3;
+        --mute: #9aa6b5;
+        --line: #2c3542;
+        --soft: #1f2834;
+        --warn: #e88b74;
+        --warnSoft: #3a221c;
+        --onN: #10141a;
+        --onG: #10141a;
+        --gInk: #4cc28c;
+        --memSoft: #1c2943;
+        --compSoft: #3b2717;
+        --ramSoft: #2a2140;
+        --ok: #4cc28c;
+        --ssd: #8f8d85;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.55 'Segoe UI',
+          system-ui,
+          -apple-system,
+          Arial,
+          sans-serif;
+      }
+      a {
+        color: var(--g);
+      }
+      .hidden {
+        display: none !important;
+      }
+      /* Header, navigation, footer (all views) */
+      .wrap {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 18px;
+      }
+      header {
+        background: var(--panel);
+        border-bottom: 1px solid var(--line);
+      }
+      header .wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        height: 60px;
+      }
+      .word {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--n);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .word span {
+        color: var(--g);
+      }
+      header nav {
+        display: flex;
+        gap: 4px;
+      }
+      header nav a {
+        color: var(--mute);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 8px 12px;
+        border-radius: 8px;
+      }
+      header nav a:hover {
+        background: var(--soft);
+        color: var(--ink);
+      }
+      header nav a.on {
+        background: var(--g2);
+        color: var(--g);
+      }
+      footer {
+        color: var(--mute);
+        font-size: 13px;
+        padding: 30px 0 50px;
+        text-align: center;
+      }
+      body:not([data-view='aihow']) .only-aihow {
+        display: none;
+      }
+      /* Outdated-data notice: appears STALE_MONTHS after STAND in every view */
+      .stale {
+        background: var(--warnSoft);
+        border-bottom: 1px solid var(--warn);
+        color: var(--ink);
+        font-size: 14px;
+      }
+      .stale .wrap {
+        padding: 10px 18px;
+      }
+      @media (max-width: 520px) {
+        header .wrap {
+          height: auto;
+          min-height: 56px;
+          flex-wrap: wrap;
+          padding: 8px 18px;
+        }
+        header nav a {
+          padding: 6px 8px;
+          font-size: 14px;
+        }
+      }
+      /* ===== Start page ===== */
+      #view-start {
+        .smain {
+          max-width: 880px;
+          margin: 0 auto;
+          padding: 48px 18px 60px;
+        }
+        h1 {
+          font-size: clamp(26px, 5vw, 38px);
+          line-height: 1.15;
+          color: var(--n);
+          letter-spacing: -0.02em;
+          margin: 0 0 10px;
+        }
+        .lead {
+          font-size: 18px;
+          color: var(--mute);
+          margin: 0 0 28px;
+          max-width: 640px;
+        }
+        .cards {
+          display: grid;
+          gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+        a.card {
+          display: block;
+          background: var(--panel);
+          border: 2px solid var(--line);
+          border-radius: 14px;
+          padding: 22px;
+          text-decoration: none;
+          color: inherit;
+          transition: border-color 0.15s;
+        }
+        a.card:hover,
+        a.card:focus-visible {
+          border-color: var(--g);
+          outline: none;
+        }
+        .card b {
+          display: block;
+          font-size: 20px;
+          color: var(--n);
+          margin-bottom: 6px;
+        }
+        .card p {
+          margin: 0 0 10px;
+          color: var(--mute);
+        }
+        .card span {
+          color: var(--g);
+          font-weight: 600;
+        }
+        .trust {
+          display: flex;
+          gap: 18px;
+          flex-wrap: wrap;
+          margin-top: 28px;
+          color: var(--mute);
+          font-size: 14px;
+        }
+        .trust span::before {
+          content: '✓ ';
+          color: var(--g);
+          font-weight: 700;
+        }
+      }
+      /* ===== Cost calculator ===== */
+      #view-aihow {
+        .narrow {
+          max-width: 880px;
+          margin: 0 auto;
+          padding: 0 18px;
+        }
+        .hero {
+          padding: 40px 0 20px;
+        }
+        .hero h1 {
+          font-size: clamp(28px, 5vw, 40px);
+          line-height: 1.15;
+          margin: 0 0 10px;
+          color: var(--n);
+          letter-spacing: -0.02em;
+        }
+        .hero p {
+          font-size: 18px;
+          color: var(--mute);
+          margin: 0;
+          max-width: 640px;
+        }
+        .trust {
+          display: flex;
+          gap: 18px;
+          flex-wrap: wrap;
+          margin-top: 14px;
+          color: var(--mute);
+          font-size: 14px;
+        }
+        .trust span::before {
+          content: '✓ ';
+          color: var(--g);
+          font-weight: 700;
+        }
+        .prog {
+          display: flex;
+          gap: 6px;
+          margin: 26px 0 14px;
+        }
+        .prog div {
+          flex: 1;
+          height: 6px;
+          border-radius: 3px;
+          background: var(--line);
+        }
+        .prog div.on {
+          background: var(--g);
+        }
+        .steplbl {
+          font-size: 13px;
+          color: var(--mute);
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          margin-bottom: 6px;
+        }
+        .panel {
+          background: var(--panel);
+          border: 1px solid var(--line);
+          border-radius: var(--r);
+          padding: 26px;
+          margin-bottom: 18px;
+        }
+        .panel h2 {
+          font-size: 24px;
+          margin: 0 0 6px;
+          color: var(--n);
+          letter-spacing: -0.01em;
+        }
+        .panel .sub {
+          color: var(--mute);
+          margin: 0 0 20px;
+        }
+        .choices {
+          display: grid;
+          gap: 12px;
+        }
+        .choices.c3 {
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+        .choices.c2 {
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+        .ch {
+          position: relative;
+          display: flex;
+          gap: 14px;
+          align-items: flex-start;
+          border: 2px solid var(--line);
+          border-radius: 12px;
+          padding: 16px;
+          cursor: pointer;
+          background: var(--panel);
+          transition:
+            border-color 0.15s,
+            background 0.15s;
+        }
+        .ch:hover {
+          border-color: color-mix(in srgb, var(--g) 55%, var(--line));
+        }
+        .ch:has(input:checked) {
+          border-color: var(--g);
+          background: var(--g2);
+        }
+        .ch input {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+        }
+        .ch .ic {
+          font-size: 26px;
+          line-height: 1;
+          flex: none;
+          width: 34px;
+          text-align: center;
+        }
+        .ch b {
+          display: block;
+          font-size: 16px;
+          margin-bottom: 2px;
+        }
+        .ch small {
+          display: block;
+          color: var(--mute);
+          font-size: 14px;
+          line-height: 1.4;
+        }
+        .ch .tick {
+          position: absolute;
+          top: 10px;
+          right: 12px;
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          border: 2px solid var(--line);
+          display: grid;
+          place-items: center;
+          font-size: 13px;
+          color: var(--onG);
+        }
+        .ch:has(input:checked) .tick {
+          background: var(--gInk);
+          border-color: var(--gInk);
+        }
+        .ch:has(input:checked) .tick::after {
+          content: '✓';
+        }
+        .ch:has(input:focus-visible) {
+          outline: 3px solid var(--n);
+          outline-offset: 2px;
+        }
+        .meter {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-top: 18px;
+          padding: 14px 16px;
+          background: var(--soft);
+          border-radius: 10px;
+        }
+        .dots {
+          display: flex;
+          gap: 5px;
+        }
+        .dots i {
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: var(--line);
+        }
+        .dots i.on {
+          background: var(--g);
+        }
+        .nav {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          margin-top: 22px;
+        }
+        button {
+          font: inherit;
+          cursor: pointer;
+          border-radius: 10px;
+          padding: 12px 20px;
+          border: 1.5px solid var(--line);
+          background: var(--panel);
+          color: var(--ink);
+        }
+        button.pri {
+          background: var(--n);
+          border-color: var(--n);
+          color: var(--onN);
+          font-weight: 600;
+        }
+        button.go {
+          background: var(--gInk);
+          border-color: var(--gInk);
+          color: var(--onG);
+          font-weight: 600;
+        }
+        button:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
+        .counter {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .counter button {
+          width: 48px;
+          height: 48px;
+          padding: 0;
+          font-size: 22px;
+          border-radius: 12px;
+        }
+        .counter input {
+          width: 110px;
+          height: 48px;
+          text-align: center;
+          font-size: 22px;
+          font-weight: 700;
+          border: 1.5px solid var(--line);
+          border-radius: 12px;
+          background: var(--bg);
+          color: var(--ink);
+        }
+        .field {
+          margin-bottom: 22px;
+        }
+        .field > label {
+          display: block;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+        .res-top {
+          display: grid;
+          grid-template-columns: 1.3fr 1fr;
+          gap: 16px;
+          align-items: stretch;
+        }
+        @media (max-width: 700px) {
+          .res-top {
+            grid-template-columns: 1fr;
+          }
+        }
+        .big {
+          background: var(--n);
+          color: var(--onN);
+          border-radius: var(--r);
+          padding: 24px;
+        }
+        .big .k {
+          font-size: 13px;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          opacity: 0.8;
+        }
+        .big .dev {
+          font-size: 22px;
+          font-weight: 700;
+          margin: 4px 0 2px;
+        }
+        .big .kind {
+          opacity: 0.85;
+          font-size: 15px;
+        }
+        .big .nums {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 14px 26px;
+          margin-top: 18px;
+        }
+        .big .nums b {
+          display: block;
+          font-size: 30px;
+          line-height: 1.1;
+        }
+        .big .nums span {
+          font-size: 13px;
+          opacity: 0.85;
+        }
+        .safe {
+          border-radius: var(--r);
+          padding: 20px;
+          border: 2px solid var(--g);
+          background: var(--g2);
+        }
+        .safe.warnb {
+          border-color: var(--warn);
+          background: color-mix(in srgb, var(--warn) 10%, var(--panel));
+        }
+        .safe b {
+          display: block;
+          font-size: 17px;
+          margin-bottom: 4px;
+        }
+        .pk {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+          gap: 12px;
+        }
+        .card {
+          border: 2px solid var(--line);
+          border-radius: 12px;
+          padding: 18px;
+          background: var(--panel);
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .card.rec {
+          border-color: var(--g);
+        }
+        .card .t {
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: var(--mute);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .card .t em {
+          font-style: normal;
+          background: var(--gInk);
+          color: var(--onG);
+          border-radius: 6px;
+          padding: 2px 8px;
+          font-size: 11px;
+          letter-spacing: 0.02em;
+        }
+        .card .h {
+          font-size: 17px;
+          font-weight: 700;
+          color: var(--n);
+          line-height: 1.3;
+        }
+        .card .kind {
+          font-size: 14px;
+          color: var(--mute);
+        }
+        .card .p {
+          font-size: 26px;
+          font-weight: 750;
+          margin-top: 8px;
+        }
+        .card .p small {
+          font-size: 14px;
+          color: var(--mute);
+          font-weight: 500;
+        }
+        .card ul {
+          list-style: none;
+          padding: 0;
+          margin: 8px 0 0;
+          font-size: 14.5px;
+        }
+        .card li {
+          padding: 5px 0;
+          border-top: 1px solid var(--line);
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          gap: 10px;
+        }
+        .card li > span {
+          flex: none;
+        }
+        .card li i,
+        .card li b {
+          font-style: normal;
+          text-align: right;
+          min-width: 0;
+        }
+        .card li span {
+          color: var(--mute);
+        }
+        .bars {
+          display: grid;
+          gap: 12px;
+        }
+        .bar {
+          display: grid;
+          grid-template-columns: 220px 1fr 110px;
+          gap: 12px;
+          align-items: center;
+          font-size: 15px;
+        }
+        @media (max-width: 600px) {
+          .bar {
+            grid-template-columns: 1fr 90px;
+          }
+          .bar .tr {
+            grid-column: 1/-1;
+            order: 3;
+          }
+        }
+        .tr {
+          height: 18px;
+          background: var(--soft);
+          border-radius: 9px;
+          overflow: hidden;
+        }
+        .tr i {
+          display: block;
+          height: 100%;
+          border-radius: 9px;
+          background: var(--mute);
+        }
+        .bar.me .tr i {
+          background: var(--g);
+        }
+        .bar b {
+          text-align: right;
+          font-variant-numeric: tabular-nums;
+        }
+        .steps {
+          counter-reset: s;
+          display: grid;
+          gap: 12px;
+        }
+        .steps div {
+          counter-increment: s;
+          display: flex;
+          gap: 14px;
+          align-items: flex-start;
+        }
+        .steps div::before {
+          content: counter(s);
+          flex: none;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: var(--n);
+          color: var(--onN);
+          display: grid;
+          place-items: center;
+          font-weight: 700;
+        }
+        .note {
+          font-size: 13.5px;
+          color: var(--mute);
+        }
+        details {
+          margin-top: 6px;
+        }
+        summary {
+          cursor: pointer;
+          color: var(--mute);
+          font-size: 14.5px;
+        }
+        #expert {
+          border: 2px dashed var(--line);
+        }
+        #expert input,
+        #expert select {
+          padding: 6px;
+          border-radius: 8px;
+          border: 1px solid var(--line);
+          background: var(--bg);
+          color: var(--ink);
+          font: inherit;
+          width: 100%;
+        }
+        #expert table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 14px;
+        }
+        #expert td,
+        #expert th {
+          padding: 5px;
+          border-bottom: 1px solid var(--line);
+          text-align: left;
+        }
+        .bgrid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+          gap: 10px;
+          margin-bottom: 12px;
+        }
+        .bgrid label {
+          font-size: 12px;
+          color: var(--mute);
+        }
+      }
+      /* ===== Technical view ===== */
+      #view-toca {
+        font-size: 15px;
+        line-height: 1.45;
+        .tmain {
+          max-width: 1240px;
+          margin: 0 auto;
+          padding: 20px 16px 40px;
+        }
+        h1 {
+          font-size: 22px;
+          margin: 0 0 4px;
+        }
+        .lead {
+          color: var(--mute);
+          margin: 0 0 16px;
+        }
+        .card {
+          background: var(--panel);
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          padding: 14px;
+        }
+        .controls {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 12px;
+          margin-bottom: 12px;
+          align-items: end;
+        }
+        .chk {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          min-height: 34px;
+          font-size: 12px;
+          color: var(--mute);
+        }
+        .chk input {
+          width: auto;
+          margin: 0;
+        }
+        .scene {
+          overflow-x: auto;
+        }
+        .scene svg {
+          min-width: 720px;
+        }
+        label,
+        .lab {
+          display: block;
+          font-size: 12px;
+          color: var(--mute);
+          margin-bottom: 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+        select,
+        input[type='range'],
+        input[type='number'] {
+          width: 100%;
+        }
+        select,
+        input[type='number'] {
+          padding: 6px;
+          border-radius: 8px;
+          border: 1px solid var(--line);
+          background: var(--bg);
+          color: var(--ink);
+          font: inherit;
+        }
+        .btns {
+          display: flex;
+          gap: 8px;
+          align-items: end;
+        }
+        button {
+          font: inherit;
+          padding: 7px 12px;
+          border-radius: 8px;
+          border: 1px solid var(--line);
+          background: var(--bg);
+          color: var(--ink);
+          cursor: pointer;
+        }
+        button:hover {
+          border-color: var(--mem);
+        }
+        .caption {
+          min-height: 48px;
+          margin: 0 0 10px;
+          padding: 10px 14px;
+          border-left: 4px solid var(--mem);
+          background: var(--panel);
+          border-radius: 0 10px 10px 0;
+        }
+        .caption b {
+          color: var(--mem);
+        }
+        svg {
+          width: 100%;
+          height: auto;
+          display: block;
+        }
+        .box {
+          stroke-width: 1.5;
+        }
+        .ssd {
+          fill: var(--panel);
+          stroke: var(--ssd);
+        }
+        .ram {
+          fill: var(--ramSoft);
+          stroke: var(--ram);
+        }
+        .cpu {
+          fill: var(--panel);
+          stroke: var(--ram);
+        }
+        .mem {
+          fill: var(--memSoft);
+          stroke: var(--mem);
+        }
+        .comp {
+          fill: var(--compSoft);
+          stroke: var(--comp);
+        }
+        .tok {
+          fill: var(--panel);
+          stroke: var(--ok);
+        }
+        .ttl {
+          font-size: 14px;
+          font-weight: 650;
+          fill: var(--ink);
+        }
+        .sub {
+          font-size: 11px;
+          fill: var(--mute);
+        }
+        .lbl {
+          font-size: 12px;
+          fill: var(--ink);
+        }
+        .link {
+          stroke: var(--line);
+          stroke-width: 3;
+        }
+        .big {
+          font-size: 16px;
+          font-weight: 700;
+          fill: var(--ok);
+        }
+        .out {
+          margin-top: 10px;
+          font-family: ui-monospace, Menlo, Consolas, monospace;
+          font-size: 14px;
+          min-height: 64px;
+          padding: 10px 12px;
+        }
+        .out span {
+          animation: pop 0.4s ease;
+        }
+        .out .ghost {
+          color: var(--draft);
+          font-style: italic;
+        }
+        .out .mask {
+          color: var(--mute);
+        }
+        .out .fix {
+          color: var(--comp);
+          font-weight: 600;
+        }
+        .grid2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-top: 12px;
+        }
+        .grid2 > * {
+          min-width: 0;
+        }
+        @media (max-width: 860px) {
+          .grid2 {
+            grid-template-columns: 1fr;
+          }
+        }
+        .kpi {
+          font-size: 34px;
+          font-weight: 750;
+          color: var(--ok);
+          line-height: 1.1;
+        }
+        .kpi small {
+          font-size: 15px;
+          color: var(--mute);
+          font-weight: 500;
+        }
+        .row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 6px 0;
+          font-size: 13px;
+        }
+        .row .n {
+          flex: 0 1 190px;
+          min-width: 96px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .row .b {
+          flex: 1 1 60px;
+          min-width: 0;
+          height: 14px;
+          background: var(--bg);
+          border-radius: 7px;
+          overflow: hidden;
+          border: 1px solid var(--line);
+        }
+        .row .b i {
+          display: block;
+          height: 100%;
+          border-radius: 7px;
+        }
+        .row .v {
+          width: 96px;
+          flex: none;
+          text-align: right;
+          white-space: nowrap;
+          font-variant-numeric: tabular-nums;
+        }
+        .formula {
+          font-family: ui-monospace, Menlo, Consolas, monospace;
+          font-size: 13px;
+          background: var(--bg);
+          padding: 8px 10px;
+          border-radius: 8px;
+          margin-top: 8px;
+        }
+        .note {
+          font-size: 12px;
+          color: var(--mute);
+          margin-top: 8px;
+        }
+        .hl {
+          outline: 2px solid var(--mem);
+          outline-offset: 2px;
+          border-radius: 4px;
+        }
+        .tbl {
+          overflow-x: auto;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          font-size: 12.5px;
+          font-variant-numeric: tabular-nums;
+        }
+        th,
+        td {
+          padding: 6px 7px;
+          border-bottom: 1px solid var(--line);
+          text-align: right;
+          white-space: nowrap;
+        }
+        th:first-child,
+        td:first-child {
+          text-align: left;
+          position: sticky;
+          left: 0;
+          background: var(--panel);
+        }
+        th {
+          font-size: 11.5px;
+          color: var(--mute);
+          font-weight: 600;
+        }
+        tr.cur td {
+          font-weight: 700;
+        }
+        td.best {
+          outline: 2px solid var(--ok);
+          outline-offset: -2px;
+          border-radius: 4px;
+        }
+        .meas {
+          color: var(--ok);
+          font-size: 11px;
+        }
+        .modes {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 8px;
+          margin-top: 10px;
+        }
+        @media (max-width: 520px) {
+          .modes {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+        .modes div {
+          min-width: 0;
+          overflow-wrap: anywhere;
+          background: var(--bg);
+          border-radius: 8px;
+          padding: 8px;
+          text-align: center;
+          font-size: 12px;
+          color: var(--mute);
+        }
+        .modes b {
+          display: block;
+          font-size: 18px;
+          color: var(--ink);
+        }
+        .modes .on {
+          outline: 2px solid var(--mem);
+        }
+        .full {
+          grid-column: 1/-1;
+        }
+        .mhead {
+          display: flex;
+          justify-content: space-between;
+          align-items: end;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        .mhead select {
+          width: auto;
+        }
+        textarea {
+          width: 100%;
+          font:
+            12px ui-monospace,
+            Menlo,
+            Consolas,
+            monospace;
+          padding: 8px;
+          border-radius: 8px;
+          border: 1px solid var(--line);
+          background: var(--bg);
+          color: var(--ink);
+        }
+        .imp {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          margin: 4px 0;
+        }
+      }
+      @keyframes pop {
+        from {
+          background: var(--ok);
+          color: var(--onG);
+        }
+        to {
+          background: transparent;
+        }
+      }
+      /* ===== Data view ===== */
+      #view-daten {
+        font-size: 15px;
+        line-height: 1.45;
+        .tmain {
+          max-width: 1240px;
+          margin: 0 auto;
+          padding: 20px 16px 40px;
+        }
+        h1 {
+          font-size: 22px;
+          margin: 0 0 4px;
+        }
+        h2 {
+          font-size: 17px;
+          margin: 0 0 10px;
+          color: var(--n);
+        }
+        .lead {
+          color: var(--mute);
+          margin: 0 0 16px;
+        }
+        .card {
+          background: var(--panel);
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          padding: 14px;
+          margin-top: 12px;
+          min-width: 0;
+        }
+        .tbl {
+          overflow-x: auto;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          font-size: 13px;
+          font-variant-numeric: tabular-nums;
+        }
+        th,
+        td {
+          padding: 6px 8px;
+          border-bottom: 1px solid var(--line);
+          text-align: left;
+          vertical-align: top;
+        }
+        th {
+          font-size: 11.5px;
+          color: var(--mute);
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          white-space: nowrap;
+        }
+        td.n,
+        th.n {
+          text-align: right;
+          white-space: nowrap;
+        }
+        td.q {
+          color: var(--mute);
+          font-size: 12.5px;
+          min-width: 220px;
+        }
+        td.miss {
+          color: var(--warn);
+        }
+        th:first-child,
+        td:first-child {
+          position: sticky;
+          left: 0;
+          background: var(--panel);
+          font-weight: 600;
+        }
+        .note {
+          font-size: 12.5px;
+          color: var(--mute);
+          margin-top: 8px;
+        }
+      }
+      /* ===== Report (print) ===== */
+      /* Report */
+      #report {
+        display: none;
+      }
+      #report {
+        --rn: #12305a;
+        --rg: #2f9a6a;
+        --rl: #eef3f8;
+        font:
+          10.5pt/1.5 'Segoe UI',
+          system-ui,
+          Arial,
+          sans-serif;
+        color: #1c2430;
+        background: #fff;
+      }
+      #report .r-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-bottom: 3px solid var(--rn);
+        padding-bottom: 10px;
+        margin-bottom: 18px;
+      }
+      #report .r-word {
+        font-size: 22pt;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--rn);
+      }
+      #report .r-word span {
+        color: var(--rg);
+      }
+      #report .r-tag {
+        font-size: 8.5pt;
+        color: #5a6676;
+      }
+      #report .r-meta {
+        text-align: right;
+        font-size: 9pt;
+        color: #5a6676;
+        line-height: 1.4;
+      }
+      #report .r-meta b {
+        color: var(--rn);
+        font-size: 11pt;
+      }
+      #report h1 {
+        font-size: 17pt;
+        color: var(--rn);
+        margin: 0 0 4px;
+      }
+      #report .r-sub {
+        color: #5a6676;
+        margin: 0 0 14px;
+      }
+      #report h2 {
+        font-size: 12pt;
+        color: var(--rn);
+        margin: 18px 0 8px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #d5dde7;
+        break-after: avoid;
+      }
+      #report .r-box {
+        background: var(--rl);
+        border-left: 5px solid var(--rg);
+        padding: 12px 16px;
+        border-radius: 0 6px 6px 0;
+        break-inside: avoid;
+      }
+      #report .r-pk {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        break-inside: avoid;
+      }
+      #report .r-c {
+        border: 1px solid #d5dde7;
+        border-radius: 6px;
+        padding: 9px;
+        font-size: 9pt;
+      }
+      #report .r-c.rec {
+        border: 2px solid var(--rg);
+      }
+      #report .r-c .t {
+        font-size: 7.5pt;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #5a6676;
+      }
+      #report .r-c .h {
+        font-weight: 700;
+        color: var(--rn);
+        font-size: 10pt;
+        margin: 2px 0 2px;
+      }
+      #report .r-c .k {
+        color: #5a6676;
+        font-size: 8.5pt;
+        margin-bottom: 4px;
+      }
+      #report .r-c .p {
+        font-size: 13pt;
+        font-weight: 700;
+      }
+      #report .r-c table td {
+        padding: 2px 0;
+        border: none;
+        font-size: 8.5pt;
+      }
+      #report .r-c table td:first-child {
+        white-space: nowrap;
+        color: #5a6676;
+        padding-right: 6px;
+      }
+      #report table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9pt;
+      }
+      #report th {
+        background: var(--rn);
+        color: #fff;
+        font-weight: 600;
+        text-align: left;
+        padding: 6px 7px;
+        font-size: 8.5pt;
+        white-space: nowrap;
+      }
+      #report td {
+        padding: 5px 7px;
+        border-bottom: 1px solid #e3e8ef;
+        vertical-align: top;
+      }
+      #report td.n {
+        text-align: right;
+        white-space: nowrap;
+      }
+      #report tr {
+        break-inside: avoid;
+      }
+      #report .r-note {
+        font-size: 8.5pt;
+        color: #5a6676;
+      }
+      #report .r-stale {
+        margin: 0 0 12px;
+        padding: 8px 12px;
+        border: 1px solid #b5462f;
+        border-radius: 6px;
+        background: #fbeae5;
+        color: #1c2430;
+        font-size: 9pt;
+      }
+      #report .r-cta {
+        margin-top: 16px;
+        padding: 12px 16px;
+        border: 2px solid var(--rn);
+        border-radius: 6px;
+        break-inside: avoid;
+      }
+      #report .r-foot {
+        display: flex;
+        justify-content: space-between;
+        font-size: 8pt;
+        color: #5a6676;
+        border-top: 1px solid #d5dde7;
+        padding-top: 6px;
+        margin-top: 22px;
+      }
+      @media print {
+        @page {
+          size: A4;
+          margin: 15mm 14mm 16mm;
+        }
+        body {
+          background: #fff !important;
+        }
+        body > *:not(#report) {
+          display: none !important;
+        }
+        #report {
+          display: block !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    </style>
+  </head>
+  <body data-view="start">
+    <header>
+      <div class="wrap">
+        <a class="word" href="#">Eigene <span>KI</span></a>
+        <nav>
+          <a href="#aihow" data-nav="aihow">Kostenrechner</a><a href="#toca" data-nav="toca">Technik</a
+          ><a href="#daten" data-nav="daten">Daten</a>
+        </nav>
+      </div>
+    </header>
+    <div id="stale" class="stale hidden" role="note"></div>
+    <section id="view-start" class="view">
+      <div class="smain">
+        <h1>Eigene KI: Kosten und Hardware verstehen</h1>
+        <p class="lead">
+          Zwei Rechner, die direkt im Browser laufen. Kein Server, keine Anmeldung, keine Datenübertragung.
+        </p>
+        <div class="cards">
+          <a class="card" href="#aihow"
+            ><b>KI-Kostenrechner</b>
+            <p>
+              Drei Fragen, dann: welche Hardware, was sie kostet und wie sie gegen Cloud-Dienste abschneidet. Mit
+              PDF-Bericht.
+            </p>
+            <span>Für Entscheider →</span></a
+          >
+          <a class="card" href="#toca"
+            ><b>Wie KI-Hardware arbeitet</b>
+            <p>
+              Animation, wie ein Token entsteht. Matrix, welches Gerät welches Modell wie schnell schafft. Eigene Geräte
+              messen.
+            </p>
+            <span>Für Technik →</span></a
+          >
+        </div>
+        <div class="trust">
+          <span>offline nutzbar</span><span>Eingaben bleiben im Browser</span><span>Richtwerte, kein Angebot</span>
+        </div>
+        <p class="lead" style="margin-top: 24px">
+          Alle Zahlen, mit denen beide Rechner arbeiten, stehen mit Quelle und Stand in der
+          <a href="#daten">Datengrundlage</a>.
+        </p>
+      </div>
+    </section>
+    <section id="view-aihow" class="view hidden">
+      <div class="narrow">
+        <section class="hero">
+          <h1>Was kostet eigene KI für Ihr Unternehmen?</h1>
+          <p>
+            Drei kurze Fragen – dann wissen Sie, welche Hardware Sie brauchen, was sie kostet und wie sie im Vergleich
+            zu Cloud-Angeboten abschneidet.
+          </p>
+          <div class="trust">
+            <span>ohne Anmeldung</span><span>ohne Fachbegriffe</span><span>Ihre Eingaben bleiben in Ihrem Browser</span>
+          </div>
+        </section>
+        <div class="prog" id="prog">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+
+        <section class="panel step" data-step="0">
+          <div class="steplbl">Frage 1 von 3</div>
+          <h2>Mit welchen Daten soll die KI arbeiten?</h2>
+          <p class="sub">Davon hängt ab, ob die KI bei Ihnen im Haus laufen sollte oder ob ein Online-Dienst genügt.</p>
+          <div class="choices c3" id="dataOpts"></div>
+          <div class="nav"><span></span><button class="pri" data-next>Weiter</button></div>
+        </section>
+
+        <section class="panel step hidden" data-step="1">
+          <div class="steplbl">Frage 2 von 3</div>
+          <h2>Wobei soll die KI helfen?</h2>
+          <p class="sub">
+            Wählen Sie alles aus, was zutrifft. Daraus ergibt sich, wie leistungsstark die KI sein muss.
+          </p>
+          <div class="choices c2" id="taskOpts"></div>
+          <div class="field" style="margin: 20px 0 0">
+            <label>Wie wichtig ist Ihnen die Qualität der Ergebnisse?</label>
+            <div class="choices c2" id="qualOpts"></div>
+          </div>
+          <div class="meter">
+            <span>Benötigte KI-Stärke:</span>
+            <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+            <b id="clsName"></b><span class="note" id="clsDesc"></span>
+          </div>
+          <div class="nav">
+            <button data-prev>Zurück</button><button class="pri" data-next id="next2">Weiter</button>
+          </div>
+        </section>
+
+        <section class="panel step hidden" data-step="2">
+          <div class="steplbl">Frage 3 von 3</div>
+          <h2>Wie viele Menschen nutzen die KI?</h2>
+          <p class="sub">Eine Schätzung reicht völlig.</p>
+          <div class="field">
+            <label for="users">Mitarbeitende, die mit der KI arbeiten</label>
+            <div class="counter">
+              <button type="button" data-d="-1" aria-label="weniger">−</button
+              ><input id="users" type="number" min="1" max="5000" value="10" inputmode="numeric" /><button
+                type="button"
+                data-d="1"
+                aria-label="mehr"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Wie oft wird die KI genutzt?</label>
+            <div class="choices c3" id="intOpts"></div>
+          </div>
+          <div class="field" style="margin-bottom: 0">
+            <label>Sollen Abläufe vollautomatisch laufen?</label>
+            <p class="note" style="margin: -4px 0 10px">
+              z. B. eingehende Anfragen automatisch beantworten oder Daten zwischen Programmen übertragen
+            </p>
+            <div class="choices c3" id="agOpts"></div>
+          </div>
+          <div class="nav">
+            <button data-prev>Zurück</button><button class="go" data-next id="go">Ergebnis anzeigen</button>
+          </div>
+        </section>
+
+        <section class="step hidden" data-step="3" id="result">
+          <div class="res-top" style="margin-bottom: 16px">
+            <div class="big" id="bigRec"></div>
+            <div class="safe" id="safe"></div>
+          </div>
+          <div class="panel">
+            <h2>Ihre Möglichkeiten</h2>
+            <p class="sub" id="packsSub"></p>
+            <div class="pk" id="packs"></div>
+          </div>
+          <div class="panel">
+            <h2>Eigene KI oder Online-Dienst?</h2>
+            <p class="sub">Kosten pro Mitarbeiter und Monat im Vergleich.</p>
+            <div class="bars" id="bars"></div>
+            <p class="note" id="cmpNote" style="margin-top: 14px"></p>
+          </div>
+          <div class="panel">
+            <h2>So gehen Sie sicher vor</h2>
+            <div class="steps" id="plan"></div>
+          </div>
+          <div class="nav">
+            <button data-prev>Antworten ändern</button
+            ><span style="display: flex; gap: 10px; flex-wrap: wrap"
+              ><button id="pdf">Ergebnis als PDF</button><button id="restart">Neu beginnen</button></span
+            >
+          </div>
+          <details class="panel" style="margin-top: 18px">
+            <summary>Wie wird gerechnet? Annahmen und Quellen</summary>
+            <p class="note" id="method"></p>
+          </details>
+        </section>
+
+        <section class="panel hidden" id="expert">
+          <h2>Erweiterte Annahmen</h2>
+          <p class="note">
+            Für alle, die die Rechnung nachvollziehen oder eigene Preise einsetzen möchten. Änderungen bleiben in diesem
+            Browser gespeichert.
+          </p>
+          <div class="bgrid">
+            <div>
+              <label for="eta">Realitätsfaktor</label
+              ><input id="eta" type="number" min="0.2" max="1" step="0.05" value="0.65" />
+            </div>
+            <div>
+              <label for="tps">Tempo-Ziel (Token/s je Nutzer)</label
+              ><input id="tps" type="number" min="5" max="100" value="15" />
+            </div>
+            <div>
+              <label for="ttft">Erste Antwort spätestens (s)</label
+              ><input id="ttft" type="number" min="1" max="30" step="0.5" value="4" />
+            </div>
+            <div>
+              <label for="hours">Arbeitszeit (h/Tag)</label
+              ><input id="hours" type="number" min="1" max="24" value="9" />
+            </div>
+            <div>
+              <label for="kwh">Strompreis €/kWh</label
+              ><input id="kwh" type="number" min="0.05" max="1" step="0.01" value="0.30" />
+            </div>
+            <div>
+              <label for="yrs">Betrachtung (Jahre)</label><input id="yrs" type="number" min="1" max="8" value="3" />
+            </div>
+            <div>
+              <label for="fx">USD → EUR</label
+              ><input id="fx" type="number" min="0.5" max="1.5" step="0.01" value="0.89" />
+            </div>
+            <div>
+              <label for="macLim">Mac-Speicherlimit</label
+              ><select id="macLim">
+                <option value=".75">75 %</option>
+                <option value=".9">90 %</option>
+              </select>
+            </div>
+            <div><label for="kunde">Unternehmen (für PDF)</label><input id="kunde" type="text" /></div>
+          </div>
+          <div style="overflow-x: auto"><table id="prices"></table></div>
+          <button id="reset" style="margin-top: 8px">Standardwerte wiederherstellen (Preise und Annahmen)</button>
+        </section>
+      </div>
+    </section>
+    <section id="view-toca" class="view hidden">
+      <div class="tmain">
+        <h1>Wie KI-Hardware arbeitet: wo der Flaschenhals sitzt</h1>
+        <p class="lead">
+          Technik-Werkzeug · ① Animation: wie ein Token entsteht · ② Matrix: welches Gerät welches Modell wie schnell
+          schafft · ③ eigene Geräte messen und importieren. Wer nur wissen will, was eigene KI kostet:
+          <a href="#aihow">zum Kostenrechner</a>. Alle Leistungswerte sind theoretische Obergrenzen, bei Hailo
+          zusätzlich mit Herstellermessung.
+        </p>
+
+        <div class="card controls">
+          <div>
+            <label for="hw">Hardware</label
+            ><select id="hw"></select>
+          </div>
+          <div>
+            <label for="model">Modell</label
+            ><select id="model"></select>
+          </div>
+          <div>
+            <label for="quant" title="Nur real verfügbare Dateien (Ollama-Tags, GGUF-Quantisierungen)">Variante</label
+            ><select id="quant"></select>
+          </div>
+          <div>
+            <label for="spec">Spekulatives Decoding</label>
+            <div class="chk"><input id="spec" type="checkbox" /><span id="specL"></span></div>
+          </div>
+          <div>
+            <label for="tMacLim">Mac: GPU-Speicherlimit</label
+            ><select id="tMacLim">
+              <option value=".75">Standard (75 %)</option>
+              <option value=".9">angehoben per sysctl (90 %)</option>
+            </select>
+          </div>
+          <div class="btns"><button id="tRestart">↺ Neu</button><button id="pause">❚❚ Pause</button></div>
+        </div>
+
+        <p class="caption" id="cap"></p>
+
+        <div class="card">
+          <div class="scene">
+            <svg
+              id="scene"
+              viewBox="0 0 1100 400"
+              role="img"
+              aria-label="Datenfluss zwischen SSD, RAM, Hauptspeicher, Speicherbus und Recheneinheiten"
+            ></svg>
+          </div>
+          <div class="out card" id="out"></div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <span class="lab">Aktuelles Setup – theoretisches Maximum</span>
+            <div class="kpi" id="kpi"></div>
+            <div id="kpi2" class="note"></div>
+            <div class="row">
+              <span class="n" id="bMemL">Speicher lesen / Token</span
+              ><span class="b"><i id="bMem" style="background: var(--mem)"></i></span><span class="v" id="vMem"></span>
+            </div>
+            <div class="row">
+              <span class="n" id="bCompL">Rechnen / Token</span
+              ><span class="b"><i id="bComp" style="background: var(--comp)"></i></span
+              ><span class="v" id="vComp"></span>
+            </div>
+            <div class="formula" id="formula"></div>
+            <div class="modes" id="modes"></div>
+          </div>
+          <div class="card">
+            <span class="lab" id="chartL">Gleiches Setup auf allen Geräten</span>
+            <div id="chart"></div>
+            <div class="note">
+              Blau = bandbreitenlimitiert · Orange = rechenlimitiert · Lila = teilweise im System-RAM · grau = passt
+              nicht / läuft nicht
+            </div>
+          </div>
+          <div class="card full">
+            <div class="mhead">
+              <span class="lab" id="matL">Auswertungsmatrix</span>
+              <div>
+                <label for="mgrp">Modellgruppe</label
+                ><select id="mgrp">
+                  <option value="Ollama">Ollama aktuell</option>
+                  <option value="Hailo">Hailo-10H Model Zoo</option>
+                  <option value="Frontier">Frontier-Modelle</option>
+                  <option value="Referenz">Referenzklassen</option>
+                  <option value="alle">alle</option>
+                </select>
+              </div>
+            </div>
+            <div class="tbl" id="matrix"></div>
+            <div class="note">
+              Feste Annahmen: 8k Kontext, 1 Nutzer, Standard-Decoding (Decision-Modelle ◆ in Entscheidungen/s). Je Gerät
+              wird die größte real verfügbare Variante gewählt, die vollständig in den Speicher passt (darunter
+              angegeben). Grün umrandet = schnellstes Gerät je Modell · * = teilweise ausgelagert ·
+              <span class="meas">gem.</span> = Herstellermessung (Hailo). Overhead je Token: 1 ms, bei Mehr-GPU-Servern
+              2 ms (2 bis 4 GPUs) bzw. 4 ms (8 GPUs, Kommunikation). Rechenzentrums-GPUs (H200/B200/B300/MI355X) sind
+              einzeln nicht käuflich, sie dienen als Mietreferenz. Werte = theoretische Obergrenze; real 60–80 %. „≈“ =
+              geschätzte Gerätewerte.
+            </div>
+          </div>
+          <div class="card full">
+            <span class="lab">③ Eigene Geräte – Ausgabe von hw-profil.sh einfügen</span>
+            <textarea id="impTxt" rows="3" placeholder='{"v":1,"host":"…"}'></textarea>
+            <div class="btns" style="margin-top: 8px; align-items: center">
+              <button id="impBtn">Gerät übernehmen</button><span class="note" id="impMsg" style="margin: 0"></span>
+            </div>
+            <div id="impList"></div>
+            <div class="btns" style="margin-top: 8px">
+              <button id="dlScript">hw-profil.sh herunterladen</button
+              ><span class="note" style="margin: 0"
+                >Linux · nur lesend · Aufruf: <code>sudo bash hw-profil.sh [modell]</code></span
+              >
+            </div>
+            <div class="note">
+              Mit gemessener Token-Rate (Skript mit Modellnamen aufrufen) kalibriert die Seite das Gerät: Theorie ×
+              gemessene Effizienz = realistische Planung. Importierte Geräte bleiben lokal in diesem Browser
+              gespeichert.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="view-daten" class="view hidden">
+      <div class="tmain">
+        <h1>Datengrundlage</h1>
+        <p class="lead">
+          Alle Werte, mit denen Kostenrechner und Technikansicht arbeiten, mit Quelle und Stand. Hardwarepreise sind
+          Neupreise in Deutschland inkl. MwSt.; Online-Dienste, Miete und Abos sind Nettopreise, der Kostenrechner
+          rechnet sie mit 19 % MwSt. hoch. Werte mit „≈“ sind Schätzungen oder Hochrechnungen.
+        </p>
+        <div class="card">
+          <h2>Geräte</h2>
+          <div class="tbl" id="dDevices"></div>
+          <p class="note" id="dDevicesNote"></p>
+        </div>
+        <div class="card">
+          <h2>Modelle</h2>
+          <div class="tbl" id="dModels"></div>
+          <p class="note">
+            Varianten sind real verfügbare Dateien (Ollama-Tags, GGUF-Quantisierungen). KV je Token: Speicher je Token
+            Gesprächsverlauf bei FP16-Cache; gezählt werden nur Schichten, deren Cache mit der Länge wächst
+            (Sliding-Window-, Mamba- und DeltaNet-Schichten halten einen festen Zustand). „Stufe“: in welcher
+            Leistungsklasse der Kostenrechner das Modell einsetzt.
+          </p>
+        </div>
+        <div class="card">
+          <h2>Online-Dienste, Miete, Abo</h2>
+          <div class="tbl" id="dCloud"></div>
+        </div>
+        <div class="card">
+          <h2>Annahmen der Rechnung</h2>
+          <div class="tbl" id="dAssume"></div>
+          <p class="note">
+            Die mit „einstellbar“ markierten Werte lassen sich im Kostenrechner unter „Erweiterte Annahmen“ ändern; hier
+            stehen die Standardwerte.
+          </p>
+        </div>
+      </div>
+    </section>
+    <footer class="wrap">
+      Richtwerte, kein verbindliches Angebot · Daten Stand <span id="stand"></span
+      ><span class="only-aihow"> · <a href="#aihow" id="expertToggle">Erweiterte Annahmen</a></span>
+    </footer>
+    <div id="report"></div>
+    <script>
+      /* ===== Shared helpers ===== */
+      const $ = (id) => document.getElementById(id);
+      const fmt = (x, d = 1) => x.toLocaleString('de-DE', { maximumFractionDigits: d, minimumFractionDigits: d });
+      const eur = (x) => x.toLocaleString('de-DE', { maximumFractionDigits: 0 }) + ' €';
+      const eur2 = (x) => x.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      const esc = (t) =>
+        String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const jahre = (n) => (n === 1 ? 'ein Jahr' : n + ' Jahre');
+      const fT = (x) => (x < 0.01 ? '<0,01' : x < 1 ? fmt(x, 2) : fmt(x, x < 10 ? 1 : 0));
+      const EFF = 0.5; // practical discount on theoretical compute
+      const VIEW_HOOKS = {}; // views register here for show and hide
+
+      /* ---- Data date ---- */
+      const STAND = '11.10.2026';
+      /* ---- Devices: one table for both views. sys = purchasable configuration with price (cost calculator), spec = source of the technical data ---- */
+      const DEVICES = [
+        {
+          id: 'pi',
+          name: 'Raspberry Pi 5 16 GB (nur CPU)',
+          bw: 17,
+          cap: 16,
+          tf: 0.1,
+          os: 1.5,
+          mem: 'LPDDR4X (Pi 5)',
+          comp: '4× Cortex-A76',
+          unified: true,
+          est: true,
+          spec: {
+            src: 'Raspberry Pi 5 Product Brief: LPDDR4X-4267; Bandbreite rechnerisch 4.267 MT/s × 32 Bit ≈ 17 GB/s (keine offizielle Angabe); Rechenleistung nur CPU, Annahme zwischen Messwert (0,03) und Theorie (0,3 TFLOPS)',
+            url: 'https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'hailo',
+          name: 'Raspberry Pi 5 16 GB + AI HAT+ 2 (Hailo-10H, eigene 8 GB)',
+          tops: 'NPU 40 TOPS INT4',
+          bw: 17,
+          cap: 8,
+          tf: 10,
+          use: 0.95,
+          mem: 'Hailo-10H: 8 GB LPDDR4X',
+          comp: 'Hailo-10H NPU (40 TOPS INT4)',
+          unified: true,
+          hailo: true,
+          est: true,
+          spec: {
+            src: 'Raspberry Pi AI HAT+ 2: Hailo-10H mit 8 GB eigenem LPDDR4X, 40 TOPS INT4; Bandbreite ≈ 17 GB/s laut Hailo-Community (LPDDR4X-4266, 32 Bit), kein Datenblattwert; FP16-TFLOPS nennt der Hersteller nicht, 10 ist eine Annahme – die Geschwindigkeit je Modell stammt aus Hailo-Messungen',
+            url: 'https://www.raspberrypi.com/products/ai-hat-plus-2/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'ddr5',
+          name: 'Desktop-CPU + DDR5 2-Kanal',
+          bw: 90,
+          cap: 64,
+          tf: 2,
+          use: 0.9,
+          mem: 'System-RAM (DDR5)',
+          comp: 'CPU-Kerne',
+          unified: true,
+          est: true,
+          spec: {
+            src: 'Generische Klasse: DDR5-5600 im Zweikanalbetrieb 5.600 MT/s × 128 Bit = 89,6 GB/s (theoretisch, real ≈ 75–80 GB/s); Rechenleistung konservative Annahme für CPU-Kerne ohne Matrix-Einheiten',
+            url: 'https://www.igorslab.de/en/arrow-lake-ddr5-detail-memory-clock-uncore-timings-core-ultra-7-265k-two-platforms/3/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'strix',
+          name: 'AMD Ryzen AI Max+ 395',
+          tops: 'NPU 50 TOPS',
+          bw: 256,
+          cap: 128,
+          tf: 59,
+          use: 0.9,
+          mem: 'Unified LPDDR5X',
+          comp: 'iGPU Radeon 8060S',
+          unified: true,
+          est: true,
+          sys: {
+            n: 'Framework Desktop (Ryzen AI Max+ 395), 128 GB',
+            kind: 'kompakter Mini-PC',
+            price: 4039,
+            load: 145,
+            idle: 12,
+            src: 'Framework Desktop DIY Edition 128 GB: 3.889 € inkl. MwSt. zzgl. 500-GB-SSD 150 €, ohne Betriebssystem; Leistungsaufnahme an der Steckdose (Phoronix 08/2025): llama.cpp Spitze 144 W, Leerlauf 12 W',
+            url: 'https://frame.work/de/de/products/desktop-diy-amd-aimax300',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: 'AMD Ryzen AI Max+ 395: 256-Bit LPDDR5X-8000 (256 GB/s), bis 128 GB, NPU 50 TOPS; Radeon 8060S FP16 59,4 TFLOPS rechnerisch (TechPowerUp), AMD nennt keine TFLOPS',
+            url: 'https://www.amd.com/en/products/processors/laptop/ryzen/ai-300-series/amd-ryzen-ai-max-plus-395.html',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'spark',
+          name: 'NVIDIA DGX Spark',
+          tops: '1 PFLOP FP4',
+          bw: 273,
+          cap: 128,
+          tf: 100,
+          use: 0.9,
+          mem: 'Unified LPDDR5X',
+          comp: 'GPU (GB10)',
+          unified: true,
+          est: true,
+          sys: {
+            n: 'ASUS Ascent GX10 (DGX Spark), 128 GB',
+            kind: 'KI-Mini-Computer von NVIDIA',
+            price: 5099,
+            load: 200,
+            idle: 30,
+            src: 'ASUS Ascent GX10 128 GB / 1 TB: ab 5.099 € (Geizhals DE; Händler 5.499–5.950 €); Leistungsaufnahme gemessen (ServeTheHome): maximal knapp 200 W, KI-Antworten 60–130 W, Leerlauf 22–45 W je Firmware',
+            url: 'https://geizhals.de/asus-ascent-gx10-gg0003bn-90ms0371-m00030-a3551306.html',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: 'NVIDIA DGX Spark: 128 GB LPDDR5X, 273 GB/s, bis 1 PFLOP FP4 (mit Sparsity); FP16 dense rechnerisch 125 TFLOPS, gemessen 99,8 TFLOPS BF16 (StorageReview) – 100 angesetzt',
+            url: 'https://www.nvidia.com/en-us/products/workstations/dgx-spark/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'm6',
+          name: 'Apple M6 (Mac mini)',
+          bw: 170,
+          cap: 32,
+          tf: 12,
+          use: 0.75,
+          mac: true,
+          mem: 'Unified Memory',
+          comp: '12-Core-GPU',
+          unified: true,
+          est: true,
+          sys: {
+            n: 'Mac mini M6, 32 GB',
+            kind: 'kompakter Mini-Computer von Apple',
+            price: 1489,
+            load: 70,
+            idle: 4,
+            src: 'Apple Store DE: 1.049 € (16 GB) + 440 € für 32 GB = 1.489 €; Handel ab 1.404 € (Geizhals); Leistungsaufnahme laut Apple: maximal 70 W (CPU-Volllast), Leerlauf 4 W',
+            url: 'https://www.apple.com/de/shop/buy-mac/mac-mini',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: 'Apple Mac mini M6 (12-Core-GPU): 170 GB/s bei 24 oder 32 GB; Apple nennt keine TFLOPS, Schätzung aus ≈ 1.024 FP16-FLOPS je GPU-Kern und Takt (Zakharko-Messung), konservativ gerundet',
+            url: 'https://www.apple.com/mac-mini/specs/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'm5p',
+          name: 'Apple M5 Pro',
+          bw: 307,
+          cap: 64,
+          tf: 30,
+          use: 0.75,
+          mac: true,
+          mem: 'Unified Memory',
+          comp: 'GPU + Neural Accel.',
+          unified: true,
+          est: true,
+          sys: {
+            n: 'Mac mini M5 Pro, 64 GB',
+            kind: 'kompakter Mini-Computer von Apple',
+            price: 3319,
+            load: 145,
+            idle: 6,
+            src: 'Apple-Konfigurator: 18-Core-CPU/20-Core-GPU, 64 GB, 512 GB SSD = 3.319 € (mit 1 TB und 10 GbE 3.759 €); Leistungsaufnahme laut Apple: maximal 145 W (CPU-Volllast), Leerlauf 6 W',
+            url: 'https://www.apple.com/de/shop/buy-mac/mac-mini',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: 'Apple Mac mini M5 Pro (20-Core-GPU): 307 GB/s, bis 64 GB; TFLOPS geschätzt wie bei allen Apple-Chips (keine Herstellerangabe)',
+            url: 'https://www.apple.com/mac-mini/specs/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'm5m',
+          name: 'Apple M5 Max',
+          bw: 614,
+          cap: 128,
+          tf: 60,
+          use: 0.75,
+          mac: true,
+          mem: 'Unified Memory',
+          comp: 'GPU + Neural Accel.',
+          unified: true,
+          est: true,
+          sys: {
+            n: 'Mac Studio M5 Max, 128 GB',
+            kind: 'leistungsstarker Arbeitsplatzrechner von Apple',
+            price: 5859,
+            load: 200,
+            idle: 7,
+            src: 'Apple-Konfigurator: M5 Max 40-Core-GPU, 128 GB, 512 GB SSD = 5.859 €; Handel ab 5.707 € (Geizhals); Leistungsaufnahme laut Apple (32-Core-Variante): maximal 200 W, Leerlauf 7 W',
+            url: 'https://www.apple.com/de/shop/buy-mac/mac-studio',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: 'Apple Mac Studio M5 Max (40-Core-GPU): 614 GB/s, bis 128 GB; TFLOPS geschätzt (keine Herstellerangabe)',
+            url: 'https://www.apple.com/mac-studio/specs/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'm5u256',
+          name: 'Apple M5 Ultra (256 GB)',
+          bw: 1200,
+          cap: 256,
+          tf: 96,
+          use: 0.75,
+          mac: true,
+          mem: 'Unified Memory',
+          comp: 'GPU + Neural Accel.',
+          unified: true,
+          est: true,
+          sys: {
+            n: 'Mac Studio M5 Ultra, 256 GB',
+            kind: 'Hochleistungsrechner von Apple',
+            price: 10999,
+            load: 385,
+            idle: 9,
+            src: 'Apple: M5 Ultra 30-Core-CPU/64-Core-GPU, 256 GB, 1 TB = 10.999 €; Handel ab 10.710 € (Geizhals); Leistungsaufnahme laut Apple (80-Core-Variante mit 512 GB): maximal 385 W, Leerlauf 9 W',
+            url: 'https://www.apple.com/de/shop/buy-mac/mac-studio',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: 'Apple Mac Studio M5 Ultra (64-Core-GPU): 1,2 TB/s, 256 GB; TFLOPS geschätzt (keine Herstellerangabe)',
+            url: 'https://www.apple.com/mac-studio/specs/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'm5u',
+          name: 'Apple M5 Ultra',
+          bw: 1200,
+          cap: 512,
+          tf: 120,
+          use: 0.75,
+          mac: true,
+          mem: 'Unified Memory',
+          comp: 'GPU + Neural Accel.',
+          unified: true,
+          est: true,
+          spec: {
+            src: 'Apple Mac Studio M5 Ultra mit 512 GB: 1,2 TB/s, nur mit 36-Core-CPU/80-Core-GPU, Auslieferung laut Apple ab Ende Oktober 2026, Preis noch nicht genannt; TFLOPS geschätzt',
+            url: 'https://www.apple.com/mac-studio/specs/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: '3090',
+          name: 'RTX 3090',
+          bw: 936,
+          cap: 24,
+          tf: 71,
+          mem: 'VRAM (GDDR6X)',
+          comp: 'GPU: SMs + Tensor Cores',
+          spec: {
+            src: 'NVIDIA GA102-Whitepaper: 936 GB/s, 24 GB GDDR6X, FP16-Tensor 71,2 TFLOPS dense (FP32-Akkumulation), TGP 350 W',
+            url: 'https://www.nvidia.com/content/PDF/nvidia-ampere-ga-102-gpu-architecture-whitepaper-v2.pdf',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: '4090',
+          name: 'RTX 4090',
+          bw: 1008,
+          cap: 24,
+          tf: 165,
+          mem: 'VRAM (GDDR6X)',
+          comp: 'GPU: SMs + Tensor Cores',
+          spec: {
+            src: 'NVIDIA Ada-Whitepaper: 1.008 GB/s, 24 GB GDDR6X, FP16-Tensor 165,2 TFLOPS dense (FP32-Akkumulation), TGP 450 W',
+            url: 'https://images.nvidia.com/aem-dam/Solutions/geforce/ada/nvidia-ada-gpu-architecture.pdf',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: '5090',
+          name: 'RTX 5090',
+          bw: 1792,
+          cap: 32,
+          tf: 209,
+          mem: 'VRAM (GDDR7)',
+          comp: 'GPU: SMs + Tensor Cores',
+          sys: {
+            n: 'Workstation 1× RTX 5090 (32 GB)',
+            kind: 'Workstation mit KI-Grafikkarte',
+            price: 8499,
+            load: 800,
+            idle: 80,
+            src: 'RTX 5090 ab 5.999 € (seit 02.10.2026 keine Karte darunter laut PCGH; 3DCenter 6.000–6.800 €) + Plattform ≈ 2.500 €; Händler-Komplettsysteme 8.149–8.849 € (Mifcom); Systemlast ≈ 800 W (Karte 510–590 W gemessen + Rest) und Leerlauf ≈ 80 W (Karte 29–34 W + Rest) geschätzt',
+            url: 'https://www.pcgameshardware.de/Geforce-RTX-5090-Grafikkarte-281029/Specials/Preis-6000-Euro-Kosten-BOM-Marge-Nvidia-Handel-1555831',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: 'NVIDIA RTX-Blackwell-Whitepaper: 1.792 GB/s, 32 GB GDDR7, FP16-Tensor 209,5 TFLOPS dense (FP32-Akkumulation), TGP 575 W',
+            url: 'https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'sv2',
+          name: '2× RTX 5090 (Server)',
+          bw: 2867,
+          cap: 64,
+          tf: 334,
+          reserve: 2,
+          ovh: 0.002,
+          mem: 'VRAM (2× GDDR7)',
+          comp: '2 GPUs, Tensor-Parallel',
+          est: true,
+          sys: {
+            n: 'Server 2× RTX 5090 (64 GB)',
+            kind: 'Server mit zwei KI-Grafikkarten',
+            price: 15200,
+            load: 1450,
+            idle: 120,
+            src: '2 × 5.999 € + Plattform ≈ 3.200 € (EPYC/Threadripper, großes Netzteil); kein Komplettangebot in Preisvergleichen, Referenz Camino-Server mit 6/8 × RTX 5090 für 40.000/50.000 € (11/2024); Last und Leerlauf geschätzt (2 × TGP 575 W + Plattform)',
+            url: 'https://www.pcgameshardware.de/Geforce-RTX-5090-Grafikkarte-281029/Specials/Preis-6000-Euro-Kosten-BOM-Marge-Nvidia-Handel-1555831',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: '2 × RTX 5090 ohne NVLink: Datenblattsummen (3.584 GB/s, 419 TFLOPS) × 0,8 als Annahme für Tensor-Parallel über PCIe, dazu 2 ms Überhang je Token',
+            url: 'https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'sv4',
+          name: '4× RTX 5090 (Server)',
+          bw: 5734,
+          cap: 128,
+          tf: 669,
+          reserve: 4,
+          ovh: 0.002,
+          mem: 'VRAM (4× GDDR7)',
+          comp: '4 GPUs, Tensor-Parallel',
+          est: true,
+          sys: {
+            n: 'Server 4× RTX 5090 (128 GB)',
+            kind: 'Server mit vier KI-Grafikkarten',
+            price: 30500,
+            load: 2700,
+            idle: 220,
+            src: '4 × 5.999 € + Plattform ≈ 6.500 € (EPYC/Threadripper, zwei Netzteile); kein Komplettangebot in Preisvergleichen, Referenz Camino-Server mit 6/8 × RTX 5090 für 40.000/50.000 € (11/2024); Last und Leerlauf geschätzt (4 × TGP 575 W + Plattform)',
+            url: 'https://www.pcgameshardware.de/Geforce-RTX-5090-Grafikkarte-281029/Specials/Preis-6000-Euro-Kosten-BOM-Marge-Nvidia-Handel-1555831',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: '4 × RTX 5090 ohne NVLink: Datenblattsummen (7.168 GB/s, 838 TFLOPS) × 0,8 als Annahme für Tensor-Parallel über PCIe, dazu 2 ms Überhang je Token',
+            url: 'https://images.nvidia.com/aem-dam/Solutions/geforce/blackwell/nvidia-rtx-blackwell-gpu-architecture.pdf',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'pro6000',
+          name: 'RTX PRO 6000 Blackwell Max-Q',
+          bw: 1792,
+          cap: 96,
+          tf: 219,
+          mem: 'VRAM (GDDR7)',
+          comp: 'GPU: SMs + Tensor Cores',
+          est: true,
+          sys: {
+            n: 'Workstation RTX PRO 6000 (96 GB)',
+            kind: 'Workstation mit Profi-KI-Grafikkarte',
+            price: 18290,
+            load: 550,
+            idle: 70,
+            src: 'PNY RTX PRO 6000 Max-Q ab 15.490 € (Geizhals DE, Spanne 15.490–17.399 €) + Plattform ≈ 2.800 €; Händler-Komplettsysteme mit der 600-W-Edition 24.299–24.699 € (Mifcom); Systemlast ≈ 550 W und Leerlauf ≈ 70 W geschätzt',
+            url: 'https://geizhals.de/pny-rtx-pro-6000-blackwell-max-q-workstation-edition-vcnrtxpro6000bq-pb-a3451949.html',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: 'NVIDIA-Datenblatt RTX PRO 6000 Blackwell Max-Q: 1.792 GB/s, 96 GB GDDR7 ECC, 3.511 AI TOPS (FP4 mit Sparsity), 300 W; FP16 dense rechnerisch 219 TFLOPS (Verhältnis 16:1 wie bei der RTX 5090)',
+            url: 'https://www.nvidia.com/content/dam/en-zz/Solutions/products/workstations/professional-desktop-gpus/rtx-pro-6000-max-q/workstation-datasheet-blackwell-rtx-pro-6000-max-q-nvidia-us-5349650-web.pdf',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'h100',
+          name: 'H100 SXM',
+          bw: 3350,
+          cap: 80,
+          tf: 989,
+          mem: 'HBM3',
+          comp: 'GPU: SMs + Tensor Cores',
+          spec: {
+            src: 'NVIDIA H100 SXM Datenblatt: 3,35 TB/s, 80 GB HBM3, FP16 1.979 TFLOPS mit Sparsity (dense die Hälfte)',
+            url: 'https://www.nvidia.com/en-us/data-center/h100/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'h200',
+          name: 'H200 (1 GPU)',
+          bw: 4800,
+          cap: 141,
+          tf: 989,
+          mem: 'HBM3e',
+          comp: 'GPU: SMs + Tensor Cores',
+          spec: {
+            src: 'NVIDIA H200 SXM Datenblatt: 4,8 TB/s, 141 GB HBM3e, FP16 1.979 TFLOPS mit Sparsity (dense die Hälfte)',
+            url: 'https://www.nvidia.com/en-us/data-center/h200/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'b200',
+          name: 'B200 (1 GPU)',
+          bw: 7700,
+          cap: 180,
+          tf: 2250,
+          mem: 'HBM3e',
+          comp: 'GPU: SMs + Tensor Cores',
+          spec: {
+            src: 'NVIDIA HGX B200: 62 TB/s und 1.440 GB je 8 GPUs (7,75 TB/s und 180 GB je GPU), FP16 36 PFLOPS mit Sparsity je 8 GPUs (dense 2,25 PFLOPS je GPU)',
+            url: 'https://www.nvidia.com/en-us/data-center/hgx/',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'b300',
+          name: 'B300 (1 GPU)',
+          bw: 8000,
+          cap: 288,
+          tf: 2250,
+          mem: 'HBM3e',
+          comp: 'GPU: SMs + Tensor Cores',
+          spec: {
+            src: 'NVIDIA Referenzarchitektur HGX B300 und DGX B300 User Guide: 8 TB/s, 288 GB HBM3e je GPU, FP16 36 PFLOPS mit Sparsity je 8 GPUs (dense 2,25 PFLOPS je GPU)',
+            url: 'https://docs.nvidia.com/enterprise-reference-architectures/hgx-ai-factory/latest/components.html',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'mi355x',
+          name: 'AMD MI355X (1 GPU)',
+          bw: 8000,
+          cap: 288,
+          tf: 2517,
+          mem: 'HBM3e',
+          comp: 'CDNA4 Compute Units',
+          spec: {
+            src: 'AMD Instinct MI355X Datenblatt: 8 TB/s, 288 GB HBM3e, FP16 2,5 PFLOPS dense (5 mit Sparsity), 1.400 W',
+            url: 'https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'h200x8',
+          name: '8× H200 (HGX-Server)',
+          bw: 38400,
+          cap: 1128,
+          tf: 7916,
+          mem: 'HBM3e (8 GPUs, NVLink)',
+          comp: '8 GPUs, Tensor-Parallel',
+          est: true,
+          ovh: 0.004,
+          spec: {
+            src: '8 × H200 laut NVIDIA-Referenzarchitektur (38,4 TB/s und 1.128 GB je Knoten, Datenblattsummen); Kommunikationsverluste über den Überhang von 4 ms je Token',
+            url: 'https://docs.nvidia.com/enterprise-reference-architectures/hgx-ai-factory-h100-h200-b200/latest/components.html',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'b300x8',
+          name: '8× B300 (HGX-Server)',
+          bw: 64000,
+          cap: 2304,
+          tf: 18000,
+          mem: 'HBM3e (8 GPUs, NVLink)',
+          comp: '8 GPUs, Tensor-Parallel',
+          est: true,
+          ovh: 0.004,
+          spec: {
+            src: '8 × B300 laut NVIDIA-Referenzarchitektur (64 TB/s und 2.304 GB je Knoten, FP16 36 PFLOPS mit Sparsity, Datenblattsummen); Kommunikationsverluste über den Überhang von 4 ms je Token',
+            url: 'https://docs.nvidia.com/enterprise-reference-architectures/hgx-ai-factory/latest/components.html',
+            date: '11.10.2026',
+          },
+        },
+        {
+          id: 'gb300',
+          name: 'DGX Station GB300',
+          bw: 7100,
+          cap: 252,
+          tf: 2500,
+          mem: '252 GB HBM3e + 496 GB LPDDR5X',
+          comp: 'GB300 Blackwell Ultra',
+          spillBw: 396,
+          spillCap: 496,
+          est: true,
+          reserve: 0,
+          sys: {
+            n: 'DGX Station GB300 (252 GB HBM + 496 GB)',
+            kind: 'KI-Hochleistungsrechner von NVIDIA',
+            price: 106500,
+            load: 1600,
+            idle: 200,
+            src: 'MSI WS300 89.500 € netto (dgxstation.ai) zuzüglich 19 % MwSt.; pi3g-Preistabelle 08.10.2026: 90.000 bis 171.500 € netto je Hersteller, Aufschlag von 10–20 % angekündigt; Last 1.600 W = Herstellermaximum, Leerlauf 200 W laut Händler Bizon (NVIDIA nennt keinen Wert)',
+            url: 'https://pi3g.com/nvidia-dgx-station-available-now-for-purchase-from-us/',
+            date: '11.10.2026',
+          },
+          spec: {
+            src: 'NVIDIA DGX Station: 252 GB HBM3e mit 7,1 TB/s, 496 GB LPDDR5X mit 396 GB/s, FP16 5 PFLOPS mit Sparsity (dense 2,5), maximal 1.600 W',
+            url: 'https://www.nvidia.com/en-us/products/workstations/dgx-station/',
+            date: '11.10.2026',
+          },
+        },
+      ];
+      /* ---- Models (real files, variants with size) ---- */
+      const MODELS = [
+        {
+          g: 'Hailo',
+          name: 'Llama 3.2 1B (Hailo)',
+          s: 'Llama3.2-1B',
+          p: 1.24,
+          a: 1.24,
+          v: [{ n: 'HEF A8W4', gb: 1.79 }],
+          kv: 32768,
+          maxCtx: 2048,
+          hailo: true,
+          meas: 9.89,
+          src: 'Hailo Model Zoo GenAI (MODELS.rst, HailoRT 5.4): Größe, Token/s und Kontext; Parameter und KV aus der Hugging-Face-Konfiguration (16 Schichten, 8 KV-Heads, Head-Dim 64); Hailo nutzt einen 8-Bit-KV-Cache',
+          url: 'https://github.com/hailo-ai/hailo_model_zoo_genai/blob/main/docs/MODELS.rst',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Hailo',
+          name: 'Qwen2.5 1.5B (Hailo)',
+          s: 'Qwen2.5-1.5B',
+          p: 1.54,
+          a: 1.54,
+          v: [{ n: 'HEF A8W4', gb: 1.64 }],
+          kv: 28672,
+          maxCtx: 2048,
+          hailo: true,
+          meas: 7.35,
+          src: 'Hailo Model Zoo GenAI (MODELS.rst, HailoRT 5.4): Größe, Token/s und Kontext; Parameter und KV aus der Hugging-Face-Konfiguration (28 Schichten, 2 KV-Heads, Head-Dim 128)',
+          url: 'https://github.com/hailo-ai/hailo_model_zoo_genai/blob/main/docs/MODELS.rst',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Hailo',
+          name: 'Qwen3 1.7B (Hailo)',
+          s: 'Qwen3-1.7B',
+          p: 1.7,
+          a: 1.7,
+          v: [{ n: 'HEF A8W4', gb: 1.79 }],
+          kv: 114688,
+          maxCtx: 2048,
+          hailo: true,
+          meas: 4.78,
+          src: 'Hailo Model Zoo GenAI (MODELS.rst, HailoRT 5.4): Größe, Token/s und Kontext; Parameter und KV aus der Hugging-Face-Konfiguration (28 Schichten, 8 KV-Heads, Head-Dim 128)',
+          url: 'https://github.com/hailo-ai/hailo_model_zoo_genai/blob/main/docs/MODELS.rst',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Hailo',
+          name: 'Qwen3-VL 2B (Hailo)',
+          s: 'Qwen3-VL-2B',
+          p: 2.1,
+          a: 2.1,
+          v: [{ n: 'HEF A16W4', gb: 2.18 }],
+          kv: 114688,
+          maxCtx: 2048,
+          hailo: true,
+          meas: 4.74,
+          src: 'Hailo Model Zoo GenAI (MODELS.rst, HailoRT 5.4): Größe, Token/s und Kontext, Quantisierung A16W4, nur Einzelbild; Parameter und KV aus der Hugging-Face-Konfiguration',
+          url: 'https://github.com/hailo-ai/hailo_model_zoo_genai/blob/main/docs/MODELS.rst',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'granite4.2:3b – dicht',
+          s: 'granite-3b',
+          tag: 'granite4.2:3b',
+          p: 3.66,
+          a: 3.66,
+          v: [{ n: 'Ollama-Tag (Q4_K_M)', gb: 2.2 }],
+          kv: 81920,
+          maxCtx: 131072,
+          src: 'Ollama-Bibliothek (Tag-Größe) und IBM-Modellkarte mit config.json auf Hugging Face: 3,66 B dicht, 40 Schichten, 8 KV-Heads, Head-Dim 64, 128K Kontext',
+          url: 'https://ollama.com/library/granite4.2:3b',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'granite4.2:8b – dicht',
+          s: 'granite-8b',
+          tag: 'granite4.2:8b',
+          p: 8.79,
+          a: 8.79,
+          v: [{ n: 'Ollama-Tag (Q4_K_M)', gb: 5.3 }],
+          kv: 163840,
+          maxCtx: 131072,
+          src: 'Ollama-Bibliothek (Tag-Größe) und IBM-Modellkarte mit config.json: 8,79 B dicht, 40 Schichten, 8 KV-Heads, Head-Dim 128, 128K Kontext',
+          url: 'https://ollama.com/library/granite4.2:8b',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'ornith-1.5:9b – dicht',
+          s: 'ornith-9b',
+          tag: 'ornith-1.5:9b',
+          p: 8.95,
+          a: 8.95,
+          v: [{ n: 'Ollama-Tag (Q4_K_M + Vision)', gb: 6.6 }],
+          kv: 32768,
+          maxCtx: 262144,
+          src: 'Ollama-Bibliothek (Tag-Größe inkl. Vision-Projector 0,9 GB) und config.json auf Hugging Face (Qwen3.5-9B-Architektur): 8 von 32 Schichten Full-Attention mit 4 KV-Heads und Head-Dim 256, Rest Gated DeltaNet mit konstantem Zustand; 256K Kontext',
+          url: 'https://ollama.com/library/ornith-1.5:9b',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'nimble 9B – Decision-Modell',
+          s: 'nimble-9b',
+          tag: 'nimble',
+          p: 8.95,
+          a: 8.95,
+          v: [{ n: 'Ollama-Tag (Q8_0)', gb: 9.5 }],
+          kv: 32768,
+          dec: true,
+          maxCtx: 8192,
+          src: 'Ollama-Bibliothek (Standard-Tag Q8_0) und Bespoke Labs: Entscheidungsmodell als LoRA-Adapter auf Qwen3.5-9B, gibt Wahrscheinlichkeiten je Option statt Text aus, Eingabe bis 8.192 Token; KV wie Qwen3.5-9B',
+          url: 'https://ollama.com/library/nimble',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'qwen3.8:27b – dicht',
+          s: 'qwen3.8-27b',
+          tag: 'qwen3.8:27b',
+          p: 27.3,
+          a: 27.3,
+          v: [{ n: 'Ollama-Tag (Q4_K_M + Vision)', gb: 18 }],
+          kv: 65536,
+          maxCtx: 262144,
+          src: 'Ollama-Bibliothek (Tag-Größe inkl. Vision-Projector 0,9 GB) und Qwen-Modellkarte mit config.json: 27 B dicht, 64 Schichten, davon 16 Full-Attention mit 4 KV-Heads und Head-Dim 256, 48 Gated-DeltaNet-Schichten mit konstantem Zustand; 256K Kontext nativ',
+          url: 'https://ollama.com/library/qwen3.8:27b',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'clef 27B – Decision-Modell',
+          s: 'clef-27b',
+          tag: 'clef',
+          p: 27.3,
+          a: 27.3,
+          v: [{ n: 'Ollama-Tag (Q4_K_M + Vision)', gb: 18 }],
+          kv: 65536,
+          dec: true,
+          maxCtx: 65536,
+          src: 'Ollama-Bibliothek (Tag-Größe) und Cloudflare: Entscheidungsmodell auf Basis Qwen3.8-27B mit eingefrorenem Backbone, gibt Wahrscheinlichkeiten je Option statt Text aus; 64K Kontext laut Cloudflare; KV wie Qwen3.8-27B',
+          url: 'https://ollama.com/library/clef',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'granite4.2:30b – dicht',
+          s: 'granite-30b',
+          tag: 'granite4.2:30b',
+          p: 29.28,
+          a: 29.28,
+          v: [{ n: 'Ollama-Tag (Q4_K_M)', gb: 18 }],
+          kv: 262144,
+          maxCtx: 131072,
+          src: 'Ollama-Bibliothek (Tag-Größe) und IBM-Modellkarte mit config.json: 29,28 B dicht (kein MoE), 64 Schichten, 8 KV-Heads, Head-Dim 128, 128K Kontext',
+          url: 'https://ollama.com/library/granite4.2:30b',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'nemotron-3.5-lightning – 30B-A3B',
+          s: 'nemotron-30b-a3b',
+          tag: 'nemotron-3.5-lightning',
+          p: 30,
+          a: 3,
+          v: [
+            { n: 'Q4_K_M', gb: 25 },
+            { n: 'Q8_0', gb: 35 },
+            { n: 'BF16', gb: 66 },
+          ],
+          kv: 6144,
+          maxCtx: 1048576,
+          src: 'Ollama-Bibliothek (Tag-Größen) und NVIDIA-Modellkarte mit config.json: 30 B gesamt, 3 B aktiv, Hybrid aus Mamba-2, MoE und 6 Attention-Schichten (2 KV-Heads, Head-Dim 128), Kontext bis 1M',
+          url: 'https://ollama.com/library/nemotron-3.5-lightning',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'laguna-xs-2.1 – 33B-A3B',
+          s: 'laguna-xs-33b-a3b',
+          tag: 'laguna-xs-2.1',
+          p: 33,
+          a: 3,
+          v: [
+            { n: 'Q4_K_M', gb: 20 },
+            { n: 'Q8_0', gb: 36 },
+            { n: 'BF16', gb: 67 },
+          ],
+          kv: 40960,
+          maxCtx: 262144,
+          src: 'Ollama-Bibliothek (Tag-Größen) und Poolside-Modellkarte mit config.json: 33 B gesamt, 3 B aktiv, 10 globale Attention-Schichten (8 KV-Heads, Head-Dim 128) und 30 Sliding-Window-Schichten mit 512 Token; 256K Kontext; KV hier mit FP16 gerechnet, Poolside selbst nutzt FP8',
+          url: 'https://ollama.com/library/laguna-xs-2.1',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'ornith-1.5:35b – 35B-A3B',
+          s: 'ornith-35b-a3b',
+          tag: 'ornith-1.5:35b',
+          p: 35,
+          a: 3,
+          v: [{ n: 'Ollama-Tag (Q4_K_M + Vision)', gb: 23 }],
+          kv: 20480,
+          maxCtx: 262144,
+          src: 'Ollama-Bibliothek (Tag-Größe inkl. Vision-Projector 0,9 GB) und config.json auf Hugging Face: 35 B gesamt, 3 B aktiv, 10 Full-Attention-Schichten (2 KV-Heads, Head-Dim 256); 256K Kontext',
+          url: 'https://ollama.com/library/ornith-1.5:35b',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Ollama',
+          name: 'laguna-s-2.1 – 118B-A8B',
+          s: 'laguna-s-118b-a8b',
+          tag: 'laguna-s-2.1',
+          p: 118,
+          a: 8,
+          v: [
+            { n: 'UD-Q4_K_M (Hugging Face, unsloth)', gb: 73.1 },
+            { n: 'Ollama-Tag q4_K_M (gemischt)', gb: 96 },
+            { n: 'Q8_0', gb: 128 },
+            { n: 'F16', gb: 235 },
+          ],
+          kv: 49152,
+          maxCtx: 262144,
+          src: 'Ollama-Bibliothek: Tag q4_K_M ist 96 GB (gemischte Quantisierung mit Q8_0- und BF16-Anteilen), Q8_0 128 GB, F16 235 GB; echtes Q4_K_M bei unsloth auf Hugging Face 73,1 GB; Poolside-config.json: 118 B gesamt, 8 B aktiv, 12 globale Attention-Schichten (8 KV-Heads, Head-Dim 128); Ollama-GGUF-Kontext 256K (Architektur 1M)',
+          url: 'https://ollama.com/library/laguna-s-2.1/tags',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'gpt-oss-120b – 117B-A5B',
+          s: 'gpt-oss-120b',
+          p: 117,
+          a: 5.1,
+          v: [{ n: 'MXFP4 (unsloth F16-GGUF)', gb: 65.4 }],
+          kv: 36864,
+          maxCtx: 131072,
+          src: 'OpenAI-Modellkarte mit config.json: 117 B gesamt, 5,1 B aktiv, 36 Schichten, davon 18 mit Sliding Window 128 Token (Cache konstant) und 18 Full-Attention mit 8 KV-Heads und Head-Dim 64; 128K Kontext; GGUF-Größe unsloth (Experten bleiben MXFP4)',
+          url: 'https://huggingface.co/unsloth/gpt-oss-120b-GGUF',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'DeepSeek V4 Flash (0731) – 284B-A13B',
+          s: 'DS-V4-Flash',
+          p: 284,
+          a: 13,
+          v: [
+            { n: 'UD-Q4_K_XL', gb: 155.1 },
+            { n: 'UD-Q8_K_XL', gb: 161.9 },
+            { n: 'UD-IQ3_XXS', gb: 104.2 },
+          ],
+          kv: 7200,
+          spec: { x: 1.9, n: 'DSpark-Draft n=3 (llama.cpp)', gb: 10.9 },
+          kvEst: true,
+          maxCtx: 1048576,
+          src: 'DeepSeek-Modellkarte mit config.json (284 B, 13 B aktiv, 1M Kontext) und unsloth-GGUF-Repo zur Version 0731 (Shard-Summen); KV je Token hochgerechnet aus der Kompression 4:1 und 128:1 laut DeepSeek-V4-Paper (≈ 3,5–7 KB), nicht in llama.cpp gemessen; Beschleunigung ×1,9 laut Unsloth-Doku mit DSpark-Drafter (+10,9 GB Speicher)',
+          url: 'https://huggingface.co/unsloth/DeepSeek-V4-Flash-0731-GGUF',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'GLM-5.3-Flash – 320B-A18B',
+          s: 'GLM-5.3-Flash',
+          p: 320,
+          a: 18,
+          v: [
+            { n: 'UD-Q4_K_XL', gb: 199.7 },
+            { n: 'UD-IQ3_XXS', gb: 120.4 },
+            { n: 'UD-Q2_K_XL', gb: 108.7 },
+            { n: 'UD-IQ1_S', gb: 93.1 },
+            { n: 'BF16', gb: 641.6 },
+          ],
+          kv: 12672,
+          spec: { x: 1.48, n: 'MTP n=2' },
+          maxCtx: 1048576,
+          src: 'Z.ai-Modellkarte mit config.json: 320 B gesamt, 18 B aktiv, 45 Schichten, davon 11 MLA-Schichten (Latent 512) mit Indexer und 34 KDA-Schichten mit konstantem Zustand; 1M Kontext; GGUF-Größen unsloth (Shard-Summen); MTP-Beschleunigung ×1,48 laut Unsloth-Messung mit n=2',
+          url: 'https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'Qwen3.5 – 397B-A17B',
+          s: 'Qwen3.5-397B',
+          p: 397,
+          a: 17,
+          v: [
+            { n: 'UD-Q4_K_XL', gb: 245.3 },
+            { n: 'UD-IQ4_XS', gb: 189.7 },
+          ],
+          kv: 30720,
+          maxCtx: 262144,
+          src: 'Qwen-Modellkarte mit config.json: 397 B gesamt, 17 B aktiv, 60 Schichten, davon 15 Full-Attention (2 KV-Heads, Head-Dim 256), Rest Gated DeltaNet; 256K nativ (YaRN bis 1M); GGUF-Größen unsloth (Shard-Summen)',
+          url: 'https://huggingface.co/unsloth/Qwen3.5-397B-A17B-GGUF',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'Mistral Large 3 – 675B-A41B',
+          s: 'Mistral-L3',
+          p: 675,
+          a: 41,
+          v: [{ n: 'UD-Q4_K_XL', gb: 387.9 }],
+          kv: 70272,
+          maxCtx: 262144,
+          src: 'Mistral-Modellkarte mit params.json: 675 B gesamt, 41 B aktiv, 61 MLA-Schichten (Latent 512 + RoPE 64), 256K Kontext; GGUF-Größe unsloth (Shard-Summe)',
+          url: 'https://huggingface.co/unsloth/Mistral-Large-3-675B-Instruct-2512-GGUF',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'GLM-5.3 – 744B-A40B',
+          s: 'GLM-5.3',
+          p: 744,
+          a: 40,
+          v: [
+            { n: 'UD-Q4_K_XL', gb: 467.3 },
+            { n: 'UD-IQ2_M', gb: 238.6 },
+            { n: 'UD-IQ1_S', gb: 216.7 },
+          ],
+          kv: 92544,
+          maxCtx: 1048576,
+          src: 'Z.ai-Modellkarte mit config.json: 78 MLA-Schichten (Latent 512 + RoPE 64) mit Indexer, 1M Kontext; Parameterzahl laut GLM-5-Paper (744 B gesamt, 40 B aktiv, gleiche Basis); GGUF-Größen unsloth (Shard-Summen)',
+          url: 'https://huggingface.co/unsloth/GLM-5.3-GGUF',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'Mistral Large 4 – 1,05T-A49B',
+          s: 'Mistral-L4',
+          p: 1050,
+          a: 52,
+          v: [{ n: 'Q4 ≈ hochgerechnet', gb: 630, est: true }],
+          kv: 70000,
+          kvEst: true,
+          maxCtx: 1048576,
+          src: 'Nur Herstellerangaben (1,05 T gesamt, 52 B aktiv, 1M Kontext); seit 06.10.2026 als API-Vorschau, offene Gewichte für Ende Oktober 2026 angekündigt, noch keine Dateien; Größe und KV je Token hochgerechnet',
+          url: 'https://docs.mistral.ai/models/mistral-large-4-0',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'DeepSeek V4 Pro (0813) – 1,6T-A49B',
+          s: 'DS-V4-Pro',
+          p: 1600,
+          a: 49,
+          v: [
+            { n: 'UD-Q4_K_XL', gb: 849.7 },
+            { n: 'UD-Q8_K_XL', gb: 873.4 },
+          ],
+          kv: 10800,
+          kvEst: true,
+          maxCtx: 1048576,
+          src: 'DeepSeek-Modellkarte mit config.json (1,6 T gesamt, 49 B aktiv, 61 Schichten mit Kompression 4:1 und 128:1, 1M Kontext) und unsloth-GGUF-Repo zur Version 0813 (Shard-Summen); KV je Token hochgerechnet (≈ 5–11 KB), nicht gemessen',
+          url: 'https://huggingface.co/unsloth/DeepSeek-V4-Pro-0813-GGUF',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'Qwen3.8 – 2,4T-A95B',
+          s: 'Qwen3.8-2.4T',
+          p: 2400,
+          a: 95,
+          v: [
+            { n: 'UD-IQ4_XS', gb: 1310.9 },
+            { n: 'UD-IQ3_XXS', gb: 955.5 },
+            { n: 'UD-IQ2_XXS', gb: 656.6 },
+          ],
+          kv: 94208,
+          maxCtx: 262144,
+          src: 'Qwen-Modellkarte mit config.json: 2,4 T gesamt, 95 B aktiv, 92 Schichten, davon 23 Full-Attention (4 KV-Heads, Head-Dim 256); 256K nativ; GGUF-Größen unsloth (Shard-Summen, kein Q4_K_XL vorhanden)',
+          url: 'https://huggingface.co/unsloth/Qwen3.8-2.4T-A95B-GGUF',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Frontier',
+          name: 'Kimi K3 – 2,8T-A104B',
+          s: 'Kimi-K3',
+          p: 2800,
+          a: 104,
+          v: [
+            { n: 'UD-Q4_K_XL', gb: 1508.7 },
+            { n: 'UD-Q8_K_XL', gb: 1561.2 },
+            { n: 'UD-Q2_K_XL', gb: 861.3 },
+            { n: 'UD-IQ2_XXS', gb: 711.1 },
+            { n: 'UD-IQ1_S', gb: 594 },
+          ],
+          kv: 27648,
+          maxCtx: 1048576,
+          src: 'Moonshot-Modellkarte mit config.json: 2,8 T gesamt, 104 B aktiv, 93 Schichten, davon 24 MLA (Latent 512 + RoPE 64) und 69 KDA-Schichten mit konstantem Zustand; 1M Kontext; GGUF-Größen unsloth (Shard-Summen)',
+          url: 'https://huggingface.co/unsloth/Kimi-K3-GGUF',
+          date: '11.10.2026',
+        },
+        {
+          g: 'Referenz',
+          name: 'Referenz: 70B dicht (Llama-3.3-Klasse)',
+          s: '70B dicht',
+          p: 70,
+          a: 70,
+          v: [
+            { n: 'Q4_K_M (Llama 3.3 70B)', gb: 42.5 },
+            { n: 'Q8_0 (Llama 3.3 70B)', gb: 75 },
+          ],
+          kv: 327680,
+          maxCtx: 131072,
+          src: 'Llama-3.3-70B-Instruct: GGUF-Größen bei bartowski und unsloth (Q4_K_M 42,5 GB, Q8_0 75,0 GB), config.json mit 80 Schichten, 8 KV-Heads, Head-Dim 128, 128K Kontext',
+          url: 'https://huggingface.co/unsloth/Llama-3.3-70B-Instruct-GGUF',
+          date: '11.10.2026',
+        },
+      ];
+      /* ---- Cost calculator: models per performance tier (key and variant from MODELS, n = display name) ---- */
+      const COST_MODELS = [
+        [
+          { s: 'granite-8b', v: 'Ollama-Tag (Q4_K_M)', n: 'Granite 4.2 8B' },
+          { s: 'ornith-9b', v: 'Ollama-Tag (Q4_K_M + Vision)', n: 'Ornith 1.5 9B' },
+        ],
+        [
+          { s: 'qwen3.8-27b', v: 'Ollama-Tag (Q4_K_M + Vision)', n: 'Qwen 3.8 27B' },
+          { s: 'laguna-xs-33b-a3b', v: 'Q4_K_M', n: 'Laguna XS 2.1 (33B-A3B, Q4)' },
+          { s: 'nemotron-30b-a3b', v: 'Q4_K_M', n: 'Nemotron 3.5 Lightning (30B-A3B, Q4)' },
+        ],
+        [
+          { s: 'GLM-5.3-Flash', v: 'UD-Q4_K_XL', n: 'GLM-5.3-Flash (Q4)' },
+          { s: 'DS-V4-Flash', v: 'UD-Q4_K_XL', n: 'DeepSeek V4 Flash (Q4)' },
+          { s: 'GLM-5.3-Flash', v: 'UD-IQ3_XXS', n: 'GLM-5.3-Flash (IQ3)' },
+          { s: 'DS-V4-Flash', v: 'UD-IQ3_XXS', n: 'DeepSeek V4 Flash (IQ3)' },
+          { s: 'laguna-s-118b-a8b', v: 'UD-Q4_K_M (Hugging Face, unsloth)', n: 'Laguna S 2.1 (118B-A8B, Q4)' },
+          { s: 'gpt-oss-120b', v: 'MXFP4 (unsloth F16-GGUF)', n: 'gpt-oss-120b' },
+        ],
+        [
+          { s: 'GLM-5.3', v: 'UD-Q4_K_XL', n: 'GLM-5.3 (Q4)' },
+          { s: 'GLM-5.3', v: 'UD-IQ2_M', n: 'GLM-5.3 (IQ2)' },
+        ],
+      ];
+      const RENT = [
+        {
+          n: '1× H200 (141 GB)',
+          cap: 141,
+          usd: 4.83,
+          src: 'Median on-demand über 34 Anbieter, getdeploying; netto',
+          url: 'https://getdeploying.com/reference/cloud-gpu/nvidia-h200',
+          date: '11.10.2026',
+        },
+        {
+          n: '1× B300 (288 GB)',
+          cap: 288,
+          usd: 8.99,
+          src: 'Median on-demand über 14 Anbieter, getdeploying; netto',
+          url: 'https://getdeploying.com/reference/cloud-gpu/nvidia-b300',
+          date: '11.10.2026',
+        },
+        {
+          n: '8× H200 (1.128 GB)',
+          cap: 1128,
+          usd: 38.64,
+          src: '8 × Median H200, getdeploying; netto',
+          url: 'https://getdeploying.com/reference/cloud-gpu/nvidia-h200',
+          date: '11.10.2026',
+        },
+      ];
+      const CLOUD = [
+        {
+          n: 'Scaleway – Mistral Small 3.2',
+          pin: 0.15,
+          pout: 0.35,
+          cur: '€',
+          src: 'Scaleway Generative APIs, mistral-small-3.2-24b-instruct-2506, Region Paris; netto',
+          url: 'https://www.scaleway.com/en/pricing/model-as-a-service/',
+          date: '11.10.2026',
+        },
+        {
+          n: 'Scaleway – Qwen3.8-27B',
+          pin: 0.6,
+          pout: 3.3,
+          cur: '€',
+          src: 'Scaleway Generative APIs, qwen3.8-27b, Region Paris; netto',
+          url: 'https://www.scaleway.com/en/pricing/model-as-a-service/',
+          date: '11.10.2026',
+        },
+        {
+          n: 'Scaleway – Qwen3.5-397B',
+          pin: 0.6,
+          pout: 3.6,
+          cur: '€',
+          src: 'Scaleway Generative APIs, qwen3.5-397b-a17b, Region Paris; netto',
+          url: 'https://www.scaleway.com/en/pricing/model-as-a-service/',
+          date: '11.10.2026',
+        },
+        {
+          n: 'Mistral API – Medium 3.5',
+          pin: 1.5,
+          pout: 7.5,
+          cur: '$',
+          src: 'Mistral AI, Ankündigung Mistral Medium 3.5 (128B dicht); netto',
+          url: 'https://mistral.ai/news/vibe-remote-agents-mistral-medium-3-5',
+          date: '22.05.2026',
+        },
+      ];
+      const SAAS_USD = 24.99;
+      const SAAS_SRC = {
+        src: 'Mistral Vibe Team, je Nutzer und Monat ohne Steuern, mindestens 2 Nutzer; zum Vergleich ChatGPT Business und Claude Team: 25 $ monatlich, 20 $ bei Jahreszahlung',
+        url: 'https://mistral.ai/pricing',
+        date: '11.10.2026',
+      }; // source of the subscription price
+
+      /* ===== Fixed assumptions of the cost model (adjustable ones are under "Erweiterte Annahmen") ===== */
+      const PEAK = 2.5; // peak load relative to the daily average of requests
+      const AGENT_RPH = 40; // requests per hour per automated workflow
+      const AGENT_P = 8000; // prompt tokens per automated request
+      const AGENT_O = 600; // answer tokens per automated request
+      const WORKDAYS = 250; // working days per year (power under load)
+      const DAYS_PER_MONTH = 21; // working days per month (pay-per-use billing)
+      const HOURS_PER_YEAR = 8760; // idle power around the clock
+      const MEM_FILL = 0.95; // usable share of memory for the model and conversation histories
+      const MAX_BATCH = 1024; // upper limit of concurrent requests per device in the search
+      const PREFILL_SLOT = 0.5; // seconds of prefill a device can handle per second (capacity planning)
+      const TEST_HOURS = 160; // rental hours for the four-week trial
+      const VAT = 1.19; // online services, rental and subscriptions are listed net; hardware prices are gross
+      const STALE_MONTHS = 6; // from this age of STAND on, every view and the report point out outdated data
+
+      /* ===== Core: memory ===== */
+      /* Usable fast memory in GB. Systems with shared memory reserve a share for the
+         operating system (Mac: adjustable), graphics cards 1 GB per GPU; devices with a fixed deduction (os) subtract it. */
+      function usableGB(dev, macUse = 0.75) {
+        if (dev.os != null) return Math.max(1, dev.cap - dev.os);
+        if (dev.unified) return dev.cap * (dev.mac ? macUse : dev.use);
+        return dev.cap - (dev.reserve ?? 1);
+      }
+
+      /* ===== Cost calculator: calculation (pure functions) ===== */
+      /* ---- Data classes ---- */
+      const DATA = [
+        {
+          id: 'hoch',
+          n: 'Besonders schützenswert',
+          d: 'Gesundheitsdaten, Mandanten- oder Personalakten, Berufsgeheimnisse',
+          rec: 'lokal',
+        },
+        {
+          id: 'intern',
+          n: 'Vertraulich',
+          d: 'Kundendaten, Angebote, Verträge, interne Unterlagen',
+          rec: 'lokal empfohlen',
+        },
+        {
+          id: 'offen',
+          n: 'Unkritisch',
+          d: 'öffentliche Inhalte, Marketingtexte, allgemeine Recherche',
+          rec: 'Cloud möglich',
+        },
+      ];
+      /* ---- Tasks: class 0=S 1=M 2=L ---- */
+      const TASKS = [
+        {
+          id: 'text',
+          n: 'E-Mails und Texte formulieren',
+          d: 'Entwürfe, Antworten, Zusammenfassungen',
+          c: 0,
+          R: 8,
+          P: 1200,
+          O: 400,
+        },
+        {
+          id: 'sort',
+          n: 'Posteingang und Belege sortieren',
+          d: 'automatisch einordnen, priorisieren, weiterleiten',
+          c: 0,
+          R: 30,
+          P: 1200,
+          O: 5,
+        },
+        {
+          id: 'docs',
+          n: 'Fragen zu eigenen Dokumenten',
+          d: 'interne Wissensdatenbank, Handbücher, Akten',
+          c: 1,
+          R: 6,
+          P: 6000,
+          O: 500,
+        },
+        {
+          id: 'fach',
+          n: 'Fachtexte erstellen',
+          d: 'Arztbriefe, Schriftsätze, Gutachten, Angebote',
+          c: 1,
+          R: 5,
+          P: 3000,
+          O: 900,
+        },
+        {
+          id: 'analyse',
+          n: 'Komplexe Analysen',
+          d: 'Entscheidungsvorlagen, Vertragsprüfung, Auswertungen',
+          c: 2,
+          R: 3,
+          P: 8000,
+          O: 1500,
+        },
+        {
+          id: 'code',
+          n: 'Programmierung und IT-Automatisierung',
+          d: 'Skripte, Schnittstellen, technische Abläufe',
+          c: 2,
+          R: 10,
+          P: 8000,
+          O: 800,
+        },
+      ];
+      const CLS = [
+        { n: 'Basis', d: 'Alltagstexte, Zusammenfassungen, Sortieraufgaben', ctx: 8192 },
+        { n: 'Profi', d: 'Fachtexte, Dokumentensuche, Assistenten', ctx: 16384 },
+        { n: 'Premium', d: 'anspruchsvolle Analysen, Programmierung, Agenten', ctx: 32768 },
+        { n: 'Spitzenklasse', d: 'nahe an den stärksten Cloud-Modellen', ctx: 32768 },
+      ];
+      /* ---- Models per class (real files, best first) ---- */
+      /* Purchasable systems and models per performance tier, derived from the shared tables */
+      const SYS0 = DEVICES.filter((d) => d.sys).map((d) => ({ ...d, ...d.sys }));
+      const MOD = COST_MODELS.map((cls) =>
+        cls.map(({ s, v, n }) => {
+          const m = MODELS.find((x) => x.s === s),
+            va = m.v.find((x) => x.n === v);
+          return { n, gb: va.gb, p: m.p, a: m.a, kv: m.kv };
+        }),
+      );
+      let SYS = JSON.parse(JSON.stringify(SYS0));
+      // v3 stores only the values the visitor changed, so untouched defaults follow data updates;
+      // v2 (a full snapshot) is still read and is replaced on the next save
+      const PRICES_KEY = 'kostenrechner.prices.v3',
+        PRICES_KEY_OLD = 'kostenrechner.prices.v2',
+        PRICE_FIELDS = ['price', 'load', 'idle'];
+      // same rules as the input fields: price > 0, power >= 0
+      const validPrice = (k, v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && (k !== 'price' || v > 0);
+      try {
+        const sv = JSON.parse(localStorage.getItem(PRICES_KEY) ?? localStorage.getItem(PRICES_KEY_OLD) ?? '{}');
+        SYS.forEach((s) => {
+          const o = sv && sv[s.id];
+          if (!o || typeof o !== 'object') return;
+          for (const k of PRICE_FIELDS) if (validPrice(k, o[k])) s[k] = o[k];
+        });
+      } catch (e) {}
+      const savePrices = () => {
+        try {
+          const o = {};
+          SYS.forEach((s) => {
+            const def = SYS0.find((d) => d.id === s.id),
+              changed = {};
+            for (const k of PRICE_FIELDS) if (s[k] !== def[k]) changed[k] = s[k];
+            if (Object.keys(changed).length) o[s.id] = changed;
+          });
+          localStorage.setItem(PRICES_KEY, JSON.stringify(o));
+          localStorage.removeItem(PRICES_KEY_OLD);
+        } catch (e) {}
+      };
+      const EXPERT_IDS = ['eta', 'tps', 'ttft', 'hours', 'kwh', 'yrs', 'fx', 'macLim', 'kunde'];
+      const saveExpert = () => {
+        try {
+          const o = {};
+          EXPERT_IDS.forEach((id) => (o[id] = $(id).value));
+          localStorage.setItem('kostenrechner.expert.v1', JSON.stringify(o));
+        } catch (e) {}
+      };
+      try {
+        const sv = JSON.parse(localStorage.getItem('kostenrechner.expert.v1') || '{}');
+        EXPERT_IDS.forEach((id) => {
+          if (typeof sv[id] === 'string') $(id).value = sv[id];
+        });
+      } catch (e) {}
+
+      function load(I, N) {
+        N = N || I.N;
+        let r = 0,
+          p = 0,
+          o = 0;
+        I.tasks.forEach((t) => {
+          const R = t.R * I.int;
+          r += R;
+          p += R * t.P;
+          o += R * t.O;
+        });
+        const userDay = N * r,
+          agentDay = I.agents * AGENT_RPH * I.H,
+          day = userDay + agentDay;
+        const P = day ? (N * p + agentDay * AGENT_P) / day : 1500,
+          O = day ? (N * o + agentDay * AGENT_O) / day : 400,
+          Pu = r ? p / r : AGENT_P; // prompt length a person experiences (without automated workflows)
+        const lam = (userDay / (I.H * 3600)) * PEAK + (I.agents * AGENT_RPH) / 3600;
+        return { day, P, Pu, O, lam, userDay, agentDay };
+      }
+      function spec(s, I) {
+        return { cap: usableGB(s, I.mac), cap2: s.spillCap || 0 };
+      }
+      /* Time to read R GB once. If the model and conversation histories (need GB) do not fit into the fast
+         memory, the excess sits in the slower second memory; the same share of the data read
+         is then read at its bandwidth (same assumption as in the technical view). */
+      function readTime(s, sp, R, need = R) {
+        const fr = need > sp.cap ? (need - sp.cap) / need : 0;
+        return (R * (1 - fr)) / s.bw + (fr ? (R * fr) / s.spillBw : 0);
+      }
+      /* Time to first token for a prompt of P tokens */
+      function prefill(s, m, I, P) {
+        return (P * 2 * m.a * 1e9) / (s.tf * 1e12 * EFF) / I.eta + readTime(s, spec(s, I), m.gb) / I.eta;
+      }
+      function trySize(s, m, ctx, I, L) {
+        const sp = spec(s, I),
+          W = m.gb,
+          tot = sp.cap + sp.cap2;
+        if (W > tot * MEM_FILL) return { ok: false, why: `Modell ${fmt(W, 0)} GB > ${fmt(tot, 0)} GB` };
+        const kvS = (m.kv * ctx) / 1e9,
+          maxSeq = Math.floor((tot * MEM_FILL - W) / kvS);
+        if (maxSeq < 1) return { ok: false, why: 'kein Platz für Gesprächsverläufe' };
+        const moe = m.a < m.p,
+          ovh = s.ovh ?? 0.001;
+        const tm = (R, need) => readTime(s, sp, R, need);
+        const tps = (b) => {
+          const Wr = moe ? W * (1 - Math.pow(1 - m.a / m.p, b)) : W;
+          return I.eta / (Math.max(tm(Wr + kvS * b, W + kvS * b), (2 * m.a * 1e9 * b) / (s.tf * 1e12 * EFF)) + ovh);
+        };
+        const one = tps(1),
+          tpre = prefill(s, m, I, L.Pu);
+        let bMax = 0;
+        for (let b = 1; b <= Math.min(maxSeq, MAX_BATCH); b++) {
+          if (tps(b) >= I.tps) bMax = b;
+          else break;
+        }
+        if (bMax < 1) return { ok: false, why: `nur ${fmt(one, 0)} Token/s je Nutzer` };
+        if (tpre > I.ttft) return { ok: false, why: `erste Antwort nach ${fmt(tpre, 1)} s` };
+        const B = (L.lam * L.O) / I.tps,
+          tpreAvg = prefill(s, m, I, L.P),
+          units = Math.max(1, Math.ceil(B / bMax - 1e-9), Math.ceil((L.lam * tpreAvg) / PREFILL_SLOT - 1e-9));
+        return { ok: true, units, bMax, one, tpre, ...costOf(s, m, units, bMax, I, L), model: m };
+      }
+      /* Purchase and power for a given load L (utilization determines power use) */
+      function costOf(s, m, units, bMax, I, L) {
+        const B = (L.lam * L.O) / I.tps,
+          util = Math.min(1, (B / bMax + L.lam * prefill(s, m, I, L.P)) / units);
+        const kwh = (units * (s.idle * HOURS_PER_YEAR + ((s.load - s.idle) * I.H * WORKDAYS * util) / PEAK)) / 1000,
+          capex = units * s.price,
+          energy = kwh * I.kwh;
+        return { util, capex, energy, tco: capex + I.yrs * energy };
+      }
+      function size(s, cls, I, N) {
+        N = N || I.N;
+        const L = load(I, N),
+          ctx = CLS[cls].ctx;
+        let last = null;
+        /* Within a performance tier the cheapest model wins; quality decides the tier. */
+        let best = null;
+        for (const m of MOD[cls]) {
+          const r = trySize(s, m, ctx, I, L);
+          if (!r.ok) {
+            last = r;
+            continue;
+          }
+          const c = N === I.N ? r : { ...r, ...costOf(s, m, r.units, r.bMax, I, load(I, I.N)) };
+          if (!best || c.tco < best.tco - 1e-9) best = c;
+        }
+        if (best) return { ...best, perUser: best.tco / (I.yrs * 12 * I.N), s, N };
+        return { ...(last || { ok: false, why: '–' }), s };
+      }
+      /* Cheapest solution that reaches at least performance tier cls. A model of a higher tier
+         can be cheaper if it answers faster on smaller hardware (e.g. MoE with few
+         active parameters); at equal cost the lower tier wins. */
+      function cheapest(cls, I, N) {
+        let b = null;
+        for (let c = cls; c < CLS.length; c++)
+          SYS.forEach((s) => {
+            const r = size(s, c, I, N);
+            if (r.ok && (!b || r.tco < b.tco - 1e-9)) b = { ...r, cls: c };
+          });
+        return b;
+      }
+      /* Up to how many employees does this solution last with the same device, the same count and
+         the same model? The device count grows with load, so an interval search is enough. */
+      const CAP_MAX = 5000;
+      function capacity(r, I) {
+        const ctx = CLS[r.cls].ctx;
+        const fits = (n) => {
+          const t = trySize(r.s, r.model, ctx, I, load(I, n));
+          return t.ok && t.units === r.units;
+        };
+        let lo = r.N,
+          hi = CAP_MAX;
+        if (!fits(lo)) return lo;
+        if (fits(hi)) return hi;
+        while (hi - lo > 1) {
+          const mid = Math.floor((lo + hi) / 2);
+          if (fits(mid)) lo = mid;
+          else hi = mid;
+        }
+        return lo;
+      }
+      function cloudFor(cls, I) {
+        const c = CLOUD[Math.min(cls, 3)],
+          f = (c.cur === '$' ? I.fx : 1) * VAT,
+          L = load(I);
+        const month = ((L.day * DAYS_PER_MONTH * (L.P * c.pin + L.O * c.pout)) / 1e6) * f;
+        return { c, month, perUser: month / I.N, tco: month * 12 * I.yrs };
+      }
+
+      /* ---------- Technical view: state and calculation ---------- */
+      const HW = [...DEVICES]; // working copy: imported devices are added here, the data table stays unchanged
+      const CTX = [512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072];
+      const BATCH = [1, 2, 4, 8, 16, 32];
+      const NB = 32,
+        K = 4,
+        L = 32,
+        LVIS = 8,
+        STEPS = 8;
+      const S = {
+        hw: HW.findIndex((h) => h.id === '5090'),
+        model: MODELS.findIndex((m) => m.s === 'qwen3.8-27b'),
+        quant: 0,
+        ctx: 4,
+        batch: 0,
+        mode: 'std',
+        spec: false,
+        grp: 'Ollama',
+        macUse: 0.75,
+      };
+      const effMode = (m) => (m.dec ? 'dec' : S.spec && m.spec ? 'spec' : 'std');
+      const usable = (h) => usableGB(h, S.macUse);
+      const wGB = (m, vi) => (m.v[vi || 0] || m.v[0]).gb;
+
+      function calc(hi = S.hw, mi = S.model, mode, vi) {
+        mode = mode || effMode(MODELS[mi]);
+        if (vi == null) vi = mi === S.model ? S.quant : 0;
+        const h = HW[hi],
+          m = MODELS[mi],
+          B = BATCH[S.batch];
+        const ctx = Math.min(CTX[S.ctx], m.maxCtx || Infinity);
+        const Wt = wGB(m, vi),
+          KV = ((m.kv * ctx * B) / 1e9) * (m.hailo ? 0.5 : 1),
+          moe = m.a < m.p,
+          draftGB = mode === 'spec' && m.spec && m.spec.gb ? m.spec.gb : 0; // drafter model for speculative decoding
+        const tot = Wt + KV + draftGB,
+          cap = usable(h),
+          sBw = h.spillBw || 90,
+          sCap = h.spillCap || 64;
+        let gpu = tot,
+          ram = 0,
+          fits = true,
+          why = '';
+        if (h.hailo && !m.hailo) {
+          fits = false;
+          why = 'nur Hailo-kompilierte Modelle (HEF)';
+        } else if (h.unified) {
+          if (tot > cap) {
+            fits = false;
+            why = `${fmt(tot)} GB nötig, ${fmt(cap, 0)} GB nutzbar`;
+          }
+        } else {
+          gpu = Math.min(tot, cap);
+          ram = tot - gpu;
+          if (ram > sCap) {
+            fits = false;
+            why = `${fmt(tot)} GB nötig, ${fmt(cap + sCap, 0)} GB inkl. RAM`;
+          }
+        }
+        const fr = ram / tot;
+        const readW = (n) => (moe ? Wt * (1 - Math.pow(1 - m.a / m.p, n)) : Wt);
+        const pass = (n, Wfn, P, kvB) => {
+          const W = Wfn(n),
+            R = W + kvB,
+            tm = (R * (1 - fr)) / h.bw + (R * fr) / sBw,
+            tc = (2 * P * 1e9 * n) / (h.tf * 1e12 * EFF),
+            t = Math.max(tm, tc) + (h.ovh ?? 0.001);
+          return { W, R, tm, tc, t, util: tc / t, frac: W / Wt };
+        };
+        let P,
+          Pdr = null,
+          tpr,
+          tm,
+          tc,
+          E = 1,
+          T;
+        if (mode === 'std') {
+          P = pass(B, readW, m.a, KV);
+          tpr = 1;
+          tm = P.tm;
+          tc = P.tc;
+          T = P.t;
+        } else if (mode === 'spec') {
+          P = pass(B, readW, m.a, KV);
+          E = m.spec.x;
+          tpr = E;
+          tm = P.tm;
+          tc = P.tc;
+          T = P.t;
+          Pdr = { t: P.t * 0.08, util: 0.05, tm: 0, tc: 0 };
+        } else if (mode === 'diff') {
+          P = pass(B * L, readW, m.a, KV);
+          tpr = L;
+          tm = STEPS * P.tm;
+          tc = STEPS * P.tc;
+          T = STEPS * P.t;
+        } else {
+          P = pass(B * ctx, readW, m.a, KV);
+          tpr = 1;
+          tm = P.tm;
+          tc = P.tc;
+          T = P.t;
+        }
+        const meas = h.hailo && m.hailo && mode === 'std' && B === 1 ? m.meas : null;
+        return {
+          h,
+          m,
+          ctx,
+          B,
+          Wt,
+          KV,
+          tot,
+          cap,
+          ram,
+          sBw,
+          fits,
+          why,
+          moe,
+          P,
+          Pdr,
+          E,
+          T,
+          tpr,
+          tm,
+          tc,
+          stream: tpr / T,
+          agg: (B * tpr) / T,
+          compBound: tc > tm,
+          meas,
+          promptTps: ctx / T,
+        };
+      }
+      const unit = () => (S.mode === 'dec' ? 'Entscheidungen/s' : 'Token/s');
+
+      const GPUDB = [
+        [/5700 ?XT/i, 448, 19.5, 'RX 5700 XT'],
+        [/RTX 3060/i, 360, 25, 'RTX 3060'],
+        [/4060 Ti/i, 288, 44, 'RTX 4060 Ti'],
+        [/RTX 4070(?! Ti)/i, 504, 58, 'RTX 4070'],
+        [/RTX 4080/i, 717, 97, 'RTX 4080'],
+        [/RTX 3090/i, 936, 71, 'RTX 3090'],
+        [/RTX 4090/i, 1008, 165, 'RTX 4090'],
+        [/RTX 5090/i, 1792, 209, 'RTX 5090'],
+        [/7900 XTX/i, 960, 123, 'RX 7900 XTX'],
+        [/H100/i, 3350, 989, 'H100'],
+      ];
+      function gpuSpec(name, vram) {
+        if (/Navi 10/i.test(name) && vram && vram < 7) return { bw: 288, tf: 14.4, n: 'RX 5600 XT' };
+        for (const [re, bw, tf, n] of GPUDB) if (re.test(name)) return { bw, tf, n };
+        return null;
+      }
+      const numOr = (v, d) => {
+        const n = typeof v === 'string' ? +v.replace(',', '.') : +v;
+        return Number.isFinite(n) && n > 0 ? n : d;
+      };
+      const strOr = (v, d) => (v == null || v === '' ? d : String(v).slice(0, 80));
+      function normProfile(p) {
+        return {
+          ...p,
+          host: strOr(p.host, 'Gerät'),
+          board: strOr(p.board, ''),
+          cpu: strOr(p.cpu, ''),
+          cpu_flags: strOr(p.cpu_flags, ''),
+          cpu_cores: numOr(p.cpu_cores, 4),
+          cpu_mhz: numOr(p.cpu_mhz, 2500),
+          ram_gb: numOr(p.ram_gb, 8),
+          ram_type: strOr(p.ram_type, ''),
+          ram_mts: numOr(p.ram_mts, 0),
+          ram_modules: numOr(p.ram_modules, 0),
+          ram_bw: numOr(p.ram_bw, 0),
+          ram_bw_measured: numOr(p.ram_bw_measured, 0),
+          ram_bw_theory: numOr(p.ram_bw_theory, 0),
+          gpu_name: strOr(p.gpu_name, ''),
+          vram_gb: numOr(p.vram_gb, 0),
+          gpu_bw: numOr(p.gpu_bw, 0),
+          gpu_tf: numOr(p.gpu_tf, 0),
+          model: strOr(p.model, ''),
+          model_size_gb: numOr(p.model_size_gb, 0),
+          eval_tps: numOr(p.eval_tps, 0),
+          ollama_proc: strOr(p.ollama_proc, ''),
+        };
+      }
+      function devFromProfile(p) {
+        p = normProfile(p || {});
+        const fl = /avx512/.test(p.cpu_flags || '')
+          ? 64
+          : /avx2/.test(p.cpu_flags || '')
+            ? 32
+            : /asimd/.test(p.cpu_flags || '')
+              ? 16
+              : 8;
+        const cpuTf = Math.max(0.05, ((p.cpu_cores || 4) * ((p.cpu_mhz || 2500) / 1000) * fl) / 1000);
+        const ramBw = p.ram_bw || p.ram_bw_measured || p.ram_bw_theory || 40,
+          pi = /Raspberry Pi/i.test(p.board || '');
+        const memLbl = `${p.ram_type || 'RAM'}${p.ram_mts ? ' ' + p.ram_mts + ' MT/s' : ''}${p.ram_modules ? ' × ' + p.ram_modules : ''}`;
+        const g =
+          p.vram_gb >= 2
+            ? p.gpu_bw
+              ? { bw: p.gpu_bw, tf: p.gpu_tf || 20, n: '' }
+              : gpuSpec(p.gpu_name || '', p.vram_gb)
+            : null;
+        let d;
+        if (g)
+          d = {
+            name: `${p.host}: ${g.n || 'GPU'} ${p.vram_gb} GB`,
+            bw: g.bw,
+            cap: p.vram_gb,
+            tf: g.tf,
+            mem: `VRAM (${g.n || 'GPU'})`,
+            comp: (p.gpu_name || 'GPU').slice(0, 34),
+            spillBw: ramBw,
+            spillCap: Math.max(1, (p.ram_gb || 8) - 4),
+            id: 'imp-' + p.host + '-gpu',
+          };
+        else
+          d = {
+            name: `${p.host}: CPU ${Math.round(p.ram_gb)} GB`,
+            bw: ramBw,
+            cap: Math.round(p.ram_gb),
+            tf: cpuTf,
+            os: pi ? 1.5 : 3,
+            mem: `System-RAM (${memLbl})`,
+            comp: (p.cpu || 'CPU').slice(0, 34),
+            unified: true,
+            id: 'imp-' + p.host + '-cpu',
+          };
+        if (p.seed) d.name += ' (Annahme)';
+        return Object.assign(d, { imported: true, seed: !!p.seed, est: !(p.ram_bw_measured || g), prof: p });
+      }
+      function calibrate(i) {
+        const d = HW[i],
+          p = d.prof;
+        d.eff = null;
+        d.effTxt = '';
+        d.procWarn = '';
+        if (!p || !p.eval_tps) return;
+        const mi = MODELS.findIndex((m) => m.tag && (p.model === m.tag || p.model === m.tag + ':latest'));
+        const sv = [S.batch, S.ctx, S.quant];
+        S.batch = 0;
+        S.ctx = 1;
+        S.quant = 0;
+        let theo = null;
+        if (mi >= 0) {
+          const c = calc(i, mi, 'std');
+          if (c.fits) theo = c.stream;
+        }
+        [S.batch, S.ctx, S.quant] = sv;
+        if (theo == null && p.model_size_gb) {
+          const sz = p.model_size_gb;
+          if (d.unified) theo = d.bw / sz;
+          else {
+            const g = Math.min(sz, usable(d)),
+              r = sz - g;
+            theo = 1 / (g / d.bw + r / d.spillBw);
+          }
+        }
+        if (theo) {
+          d.eff = clamp(p.eval_tps / theo, 0.03, 1.5);
+          d.effTxt = `${p.model}: gemessen ${fmt(p.eval_tps, 1)} tok/s = ${fmt(100 * d.eff, 0)} % der Theorie`;
+        }
+        if (!d.unified && /100% CPU/.test(p.ollama_proc || ''))
+          d.procWarn = 'Achtung: Ollama lief zu 100 % auf der CPU – die GPU wird nicht genutzt (Backend prüfen).';
+      }
+      const LS = 'llmcalc.devices.v1';
+      function loadProfiles() {
+        try {
+          const a = JSON.parse(localStorage.getItem(LS) || '[]');
+          return Array.isArray(a) ? a.filter((x) => x && typeof x === 'object' && x.host) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+      function saveProfiles(a) {
+        try {
+          localStorage.setItem(LS, JSON.stringify(a));
+        } catch (e) {}
+      }
+      function addProfile(p, persist) {
+        const d = devFromProfile(p),
+          ex = HW.findIndex((h) => h.id === d.id);
+        if (ex >= 0) HW[ex] = d;
+        else HW.push(d);
+        const i = HW.indexOf(d);
+        calibrate(i);
+        if (persist) {
+          const a = loadProfiles().filter((x) => devFromProfile(x).id !== d.id);
+          a.push(p);
+          saveProfiles(a);
+        }
+        return i;
+      }
+
+      /* ===== Cost calculator: interaction ===== */
+      {
+        /* ================= Interface ================= */
+        const DATA_IC = ['🔒', '🗂️', '🌐'],
+          DATA_EX = [
+            'Ihre KI sollte im eigenen Haus laufen.',
+            'Eigene KI empfohlen, EU-Dienste nach Prüfung möglich.',
+            'Ein Online-Dienst ist zulässig.',
+          ];
+        const TASK_IC = ['✉️', '📥', '📚', '📝', '📊', '⚙️'];
+        const QUAL = [
+          { v: 0, ic: '👍', n: 'Gute Ergebnisse genügen', d: 'Die KI passt genau zu Ihren Aufgaben.' },
+          {
+            v: 1,
+            ic: '⭐',
+            n: 'Möglichst hohe Qualität',
+            d: 'Eine Stufe stärker – mehr Reserve für schwierige Fälle.',
+          },
+        ];
+        const INT = [
+          { v: 0.4, ic: '🗓️', n: 'Gelegentlich', d: 'ein paar Mal pro Woche' },
+          { v: 1, ic: '☀️', n: 'Täglich', d: 'gehört zum Arbeitsalltag' },
+          { v: 2, ic: '⚡', n: 'Ständig', d: 'zentrales Werkzeug für viele Aufgaben' },
+        ];
+        const AG = [
+          { v: 0, ic: '✋', n: 'Nein', d: 'Menschen nutzen die KI direkt' },
+          { v: 2, ic: '🔁', n: 'Ein paar', d: '1–3 automatische Abläufe' },
+          { v: 8, ic: '🏭', n: 'Viele', d: 'umfangreiche Automatisierung' },
+        ];
+        const CLS_PLAIN = [
+          'für Alltagstexte und einfache Aufgaben',
+          'für Fachtexte und Fragen zu Ihren Unterlagen',
+          'für anspruchsvolle Analysen und Automatisierung',
+          'nahe an den stärksten KI-Diensten der Welt',
+        ];
+        const ch = (type, name, val, ic, b, s, chk) =>
+          `<label class="ch"><input type="${type}" name="${name}" value="${val}" ${chk ? 'checked' : ''}><span class="ic" aria-hidden="true">${ic}</span><span><b>${b}</b><small>${s}</small></span><span class="tick" aria-hidden="true"></span></label>`;
+        $('dataOpts').innerHTML = DATA.map((d, i) =>
+          ch(
+            'radio',
+            'data',
+            i,
+            DATA_IC[i],
+            d.n,
+            `${d.d}<br><span style="color:var(--g);font-weight:600">→ ${DATA_EX[i]}</span>`,
+            i === 1,
+          ),
+        ).join('');
+        $('taskOpts').innerHTML = TASKS.map((t, i) => ch('checkbox', 'task', i, TASK_IC[i], t.n, t.d, i === 0)).join(
+          '',
+        );
+        $('qualOpts').innerHTML = QUAL.map((q, i) => ch('radio', 'qual', q.v, q.ic, q.n, q.d, i === 0)).join('');
+        $('intOpts').innerHTML = INT.map((q, i) => ch('radio', 'int', q.v, q.ic, q.n, q.d, i === 1)).join('');
+        $('agOpts').innerHTML = AG.map((q, i) => ch('radio', 'ag', q.v, q.ic, q.n, q.d, i === 0)).join('');
+        const val = (n) => {
+          const e = document.querySelector(`input[name=${n}]:checked`);
+          return e ? +e.value : 0;
+        };
+        function inp() {
+          const tasks = [...document.querySelectorAll('input[name=task]:checked')].map((x) => TASKS[+x.value]);
+          const agents = val('ag');
+          let cls = tasks.reduce((m, t) => Math.max(m, t.c), 0);
+          if (agents > 0) cls = Math.max(cls, 1);
+          cls = Math.min(3, cls + val('qual'));
+          return {
+            data: val('data'),
+            tasks,
+            cls,
+            N: clamp(Math.round(+$('users').value || 1), 1, 5000),
+            int: val('int'),
+            agents,
+            H: clamp(+$('hours').value || 9, 1, 24),
+            eta: clamp(+$('eta').value || 0.65, 0.2, 1),
+            tps: clamp(+$('tps').value || 15, 5, 100),
+            ttft: clamp(+$('ttft').value || 4, 1, 30),
+            kwh: clamp(+$('kwh').value || 0.3, 0.05, 1),
+            yrs: clamp(Math.round(+$('yrs').value || 3), 1, 8),
+            fx: clamp(+$('fx').value || 0.86, 0.5, 1.5),
+            mac: +$('macLim').value || 0.75,
+            kunde: $('kunde').value.trim(),
+          };
+        }
+        /* Steps */
+        let step = 0;
+        function show(n) {
+          step = n;
+          document.querySelectorAll('.step').forEach((s) => s.classList.toggle('hidden', +s.dataset.step !== n));
+          document.querySelectorAll('#prog div').forEach((d, i) => d.classList.toggle('on', i <= n));
+          if (n === 3) run();
+          window.scrollTo({ top: document.querySelector('.prog').offsetTop - 10, behavior: 'smooth' });
+        }
+        document.querySelectorAll('[data-next]').forEach((b) => (b.onclick = () => show(step + 1)));
+        document.querySelectorAll('[data-prev]').forEach((b) => (b.onclick = () => show(Math.max(0, step - 1))));
+        $('restart').onclick = () => {
+          location.reload();
+        };
+        document.querySelectorAll('.counter button').forEach(
+          (b) =>
+            (b.onclick = () => {
+              const u = $('users'),
+                v = +u.value || 1,
+                d = +b.dataset.d,
+                s = v >= 100 ? 10 : v >= 20 ? 5 : 1;
+              u.value = clamp(v + d * s, 1, 5000);
+            }),
+        );
+        function meter() {
+          const I = inp();
+          document.querySelectorAll('#dots i').forEach((d, i) => d.classList.toggle('on', i <= I.cls));
+          $('clsName').textContent = CLS[I.cls].n;
+          $('clsDesc').textContent = CLS_PLAIN[I.cls];
+          const none = !I.tasks.length && !I.agents;
+          $('next2').disabled = none;
+          $('go').disabled = none;
+        }
+        document.addEventListener('change', (e) => {
+          if (!e.target.closest('#view-aihow')) return;
+          if (e.target.closest('#taskOpts,#qualOpts,#agOpts')) meter();
+          if (step === 3) run();
+        });
+        meter();
+        /* Result */
+        const speed = (t) => (t >= 45 ? 'sehr flüssig' : t >= 22 ? 'flüssig' : 'angenehm');
+        let last = null;
+        function run() {
+          const I = inp(),
+            L = load(I),
+            d = DATA[I.data];
+          /* Cards: only variants that differ in device, count or model */
+          const need = I.cls,
+            p1 = cheapest(need, I, I.N),
+            p2 = cheapest(need, I, Math.ceil(I.N * 1.5)),
+            c1 = p1 ? p1.cls : need,
+            p3 = c1 < 3 ? cheapest(c1 + 1, I, I.N) : cheapest(3, I, I.N * 2);
+          const same = (a, b) => !!a && !!b && a.s === b.s && a.units === b.units && a.model === b.model;
+          const rec = p2 || p1;
+          const packs = [{ t: 'Einstieg', d: 'Die günstigste Lösung, die heute reicht.', r: p1 }];
+          if (p2 && !same(p1, p2))
+            packs.push({
+              t: 'Mit Reserve',
+              d: 'Die günstigste Lösung, wenn 50 % mehr Mitarbeitende dazukommen.',
+              r: p2,
+              ref: p1,
+            });
+          if (p3 && !same(p1, p3) && !same(p2, p3))
+            packs.push(
+              c1 < 3
+                ? {
+                    t: `Nächste Stufe: ${CLS[c1 + 1].n}`,
+                    d: `Die günstigste Lösung mit einem Modell der Stufe ${CLS[c1 + 1].n}, ${CLS_PLAIN[c1 + 1]}.`,
+                    r: p3,
+                    ref: p1,
+                  }
+                : { t: 'Ausbau', d: 'Die günstigste Lösung für doppelt so viele Mitarbeitende.', r: p3, ref: p1 },
+            );
+          packs.forEach((pk) => {
+            if (pk.r) pk.cap = capacity(pk.r, I);
+            pk.rec = same(pk.r, rec);
+          });
+          const capTxt = (c) => (c >= CAP_MAX ? `mehr als ${CAP_MAX.toLocaleString('de-DE')}` : `ca. ${c}`);
+          const diff = (v) => (v >= 0 ? '+' : '−') + eur(Math.abs(v));
+          const cl = cloudFor(I.cls, I),
+            saas = SAAS_USD * I.fx * VAT;
+          const recPack = packs.find((pk) => pk.rec);
+          $('bigRec').innerHTML = rec
+            ? `<div class="k">Empfehlung</div><div class="dev">${rec.units > 1 ? rec.units + ' × ' : ''}${esc(rec.s.n)}</div><div class="kind">${esc(rec.s.kind || '')} · KI-Modell ${esc(rec.model.n)} (Stufe ${CLS[rec.cls].n})</div>
+    <div class="nums"><div><b>${eur(rec.capex)}</b><span>einmalig</span></div><div><b>${eur2(rec.perUser)}</b><span>pro Mitarbeiter und Monat*</span></div><div><b>${capTxt(recPack ? recPack.cap : I.N)}</b><span>Mitarbeitende reichen damit</span></div></div><div class="kind" style="margin-top:10px;font-size:13px">* Anschaffung und Strom auf ${jahre(I.yrs)} verteilt${rec.cls > need ? `<br>Ein Modell der Stufe ${CLS[rec.cls].n} ist hier günstiger als eines der Stufe ${CLS[need].n}, weil es auf dieser Hardware schneller antwortet.` : ''}</div>`
+            : `<div class="k">Ergebnis</div><div class="dev">Diese Kombination ist mit heutiger Hardware nicht wirtschaftlich.</div><div class="kind">Wählen Sie eine niedrigere Qualitätsstufe oder weniger Aufgaben.</div>`;
+          const sens = I.data === 0;
+          $('safe').className = 'safe' + (I.data === 2 ? ' warnb' : '');
+          $('safe').innerHTML =
+            I.data === 2
+              ? `<b>Ein Online-Dienst wäre hier zulässig</b>Ihre Daten sind unkritisch. Online-Dienste sind meist günstiger. Eigene KI lohnt sich, wenn Sie unabhängig bleiben oder feste Kosten wollen.`
+              : `<b>${sens ? 'Ihre Daten bleiben im Haus' : 'Ihre Daten bleiben unter Ihrer Kontrolle'}</b>${sens ? 'Gesundheits-, Mandanten- oder Personaldaten sollten Ihr Unternehmen nicht verlassen. Mit eigener KI ist das gewährleistet.' : 'Mit eigener KI entscheiden Sie selbst, wo Ihre Daten liegen. Online-Dienste aus der EU sind nach Prüfung möglich.'}`;
+          $('packsSub').textContent =
+            `Gezeigt wird nur, was sich tatsächlich unterscheidet. Alle Varianten erfüllen Ihre Anforderungen; die Kosten pro Mitarbeiter enthalten Anschaffung und Strom über ${jahre(I.yrs)}.`;
+          $('packs').innerHTML = packs
+            .map((pk) => {
+              const r = pk.r;
+              if (!r)
+                return `<div class="card"><div class="t">${pk.t}</div><div class="h">nicht möglich</div><div class="kind">Für diese Stufe gibt es derzeit keine passende Hardware.</div></div>`;
+              const ref = pk.ref;
+              return `<div class="card ${pk.rec ? 'rec' : ''}"><div class="t">${esc(pk.t)}${pk.rec ? '<em>Tipp</em>' : ''}</div><div class="h">${r.units > 1 ? r.units + ' × ' : ''}${esc(r.s.n)}</div><div class="kind">${esc(r.s.kind || '')}</div><div class="p">${eur(r.capex)} <small>einmalig</small></div><div class="kind">${pk.d}</div>
+    <ul><li><span>pro Mitarbeiter/Monat</span><b>${eur2(r.perUser)}</b></li><li><span>Strom pro Jahr</span><i>${eur(r.energy)}</i></li><li><span>reicht bis</span><b>${capTxt(pk.cap)} Mitarbeitende</b></li><li><span>Antworten</span><i>${speed(r.one)}</i></li><li><span>Wartezeit bis zur Antwort</span><i>≈ ${fmt(Math.max(0.5, r.tpre), 1)} s</i></li><li><span>KI-Modell</span><i>${esc(r.model.n)} · ${CLS[r.cls].n}</i></li>${ref ? `<li><span>Anschaffung ggü. Einstieg</span><i>${diff(r.capex - ref.capex)}</i></li><li><span>Strom/Jahr ggü. Einstieg</span><i>${diff(r.energy - ref.energy)}</i></li>` : ''}</ul></div>`;
+            })
+            .join('');
+          const rows = [
+            { n: 'Online-Dienst, Abrechnung nach Nutzung', v: cl.perUser, warn: sens },
+            { n: 'Online-Dienst, Abo pro Arbeitsplatz', v: saas, warn: sens },
+          ];
+          if (rec) rows.push({ n: 'Eigene KI (Empfehlung)', v: rec.perUser, me: true });
+          const mx = Math.max(...rows.map((r) => r.v));
+          $('bars').innerHTML = rows
+            .map(
+              (r) =>
+                `<div class="bar ${r.me ? 'me' : ''}"><span>${r.n}${r.warn ? ' <span style="color:var(--warn);font-size:13px">· bei Ihren Daten kritisch</span>' : ''}</span><div class="tr"><i style="width:${Math.max(2, (100 * r.v) / mx)}%"></i></div><b>${eur2(r.v)}</b></div>`,
+            )
+            .join('');
+          $('cmpNote').textContent =
+            `Ehrlich gesagt: Die Abrechnung nach Nutzung ist bei kleinen Teams fast immer am günstigsten. Eigene KI lohnt sich durch Datenschutz, Unabhängigkeit von Anbietern und feste, planbare Kosten – und ist oft günstiger als Abos pro Arbeitsplatz. Annahme: ${fmt(L.day, 0)} KI-Anfragen pro Arbeitstag.`;
+          const best = MOD[I.cls][0],
+            rent = RENT.find((x) => x.cap * 0.9 >= best.gb + 5) || RENT[RENT.length - 1],
+            cost = TEST_HOURS * rent.usd * I.fx * VAT;
+          $('plan').innerHTML =
+            `<div><span><b>Vier Wochen testen – ohne Hardware zu kaufen.</b><br>Die KI läuft auf gemieteter Rechenleistung und wird mit Ihren echten Aufgaben erprobt. Kosten rund ${eur(cost)}.${sens ? ' Getestet wird mit anonymisierten Beispieldaten.' : ''}</span></div>
+   <div><span><b>Entscheiden – mit echten Erfahrungswerten.</b><br>Erst wenn Qualität und Akzeptanz im Team stimmen, wird Hardware gekauft.</span></div>
+   <div><span><b>Einrichten und loslegen.</b><br>Die Hardware wird aufgestellt, eingerichtet und mit Ihren Programmen verbunden.</span></div>`;
+          $('method').textContent =
+            `Aus Ihren Aufgaben und der Nutzungshäufigkeit ergeben sich Anfragen pro Tag; für die Spitzenzeit wird mit dem ${fmt(PEAK, 1)}-Fachen gerechnet, automatische Abläufe mit ${AGENT_RPH} Anfragen pro Stunde. Je Gerät wird geprüft, ob das KI-Modell in den Speicher passt, ob alle Nutzer flüssige Antworten bekommen und wie lange die erste Antwort dauert. Die Leistung wird aus Speichergeschwindigkeit und Rechenleistung abgeleitet, abzüglich eines Praxisabschlags. Preise: Neupreise in Deutschland inkl. MwSt., Stand ${STAND} (Hersteller, Geizhals, PCGH, Händler); Online-Dienste (Scaleway Paris, Mistral), Miete (getdeploying) und Abos sind Nettopreise und werden für den Vergleich um 19 % MwSt. erhöht, Dollar zum EZB-Kurs. Nicht enthalten: Einrichtung, Betreuung, Anbindung an Ihre Programme. Richtwerte, kein verbindliches Angebot.`;
+          last = { I, L, packs, cl, saas, rec, rent, cost, best, d, capTxt, diff, recCap: recPack ? recPack.cap : I.N };
+          report();
+        }
+        /* Advanced assumptions */
+        function toggleExpert(on) {
+          $('expert').classList.toggle('hidden', !on);
+          if (on) priceTable();
+        }
+        $('expertToggle').onclick = (e) => {
+          e.preventDefault();
+          const on = $('expert').classList.contains('hidden');
+          toggleExpert(on);
+          if (on) $('expert').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        function priceTable() {
+          $('prices').innerHTML =
+            `<tr><th>System</th><th>Preis €</th><th>Last W</th><th>Leerlauf W</th><th>Quelle</th></tr>` +
+            SYS.map(
+              (s, i) =>
+                `<tr><td>${esc(s.n)}</td><td><input data-i="${i}" data-k="price" type="number" value="${esc(s.price)}" style="width:100px"></td><td><input data-i="${i}" data-k="load" type="number" value="${esc(s.load)}" style="width:80px"></td><td><input data-i="${i}" data-k="idle" type="number" value="${esc(s.idle)}" style="width:70px"></td><td class="note">${esc(s.src)}</td></tr>`,
+            ).join('');
+          $('prices')
+            .querySelectorAll('input')
+            .forEach(
+              (x) =>
+                (x.onchange = () => {
+                  const i = +x.dataset.i,
+                    k = x.dataset.k,
+                    v = +x.value;
+                  if (x.value.trim() === '' || !Number.isFinite(v) || v < 0 || (k === 'price' && v <= 0)) {
+                    x.value = SYS[i][k]; // invalid input: keep the old value
+                    return;
+                  }
+                  SYS[i][k] = v;
+                  savePrices();
+                }),
+            );
+        }
+        if (new URLSearchParams(location.search).has('expert')) toggleExpert(true);
+        $('reset').onclick = () => {
+          SYS = JSON.parse(JSON.stringify(SYS0));
+          EXPERT_IDS.forEach((id) => {
+            const e = $(id);
+            if (e.tagName === 'SELECT') e.selectedIndex = 0;
+            else e.value = e.defaultValue;
+          });
+          try {
+            localStorage.removeItem(PRICES_KEY);
+            localStorage.removeItem(PRICES_KEY_OLD);
+            localStorage.removeItem('kostenrechner.expert.v1');
+          } catch (e) {}
+          priceTable();
+          if (step === 3) run();
+        };
+        document
+          .querySelectorAll('#expert input,#expert select')
+          .forEach((e) => e.addEventListener('change', saveExpert));
+        /* Report */
+        function report() {
+          const { I, L, packs, cl, saas, rec, rent, cost, best, d, capTxt, diff, recCap } = last,
+            dt = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+          const kunde = I.kunde ? esc(I.kunde) : '',
+            sens = I.data === 0,
+            stale = staleText();
+          const pk = packs
+            .map((p) => {
+              const r = p.r;
+              if (!r) return `<div class="r-c"><div class="t">${p.t}</div><div class="h">nicht möglich</div></div>`;
+              return `<div class="r-c ${p.rec ? 'rec' : ''}"><div class="t">${esc(p.t)}</div><div class="h">${r.units > 1 ? r.units + ' × ' : ''}${esc(r.s.n)}</div><div class="k">${esc(r.s.kind || '')}</div><div class="p">${eur(r.capex)}</div><table><tr><td>pro Mitarbeiter/Mon.</td><td class="n">${eur2(r.perUser)}</td></tr><tr><td>Strom/Jahr</td><td class="n">${eur(r.energy)}</td></tr><tr><td>reicht bis</td><td class="n">${capTxt(p.cap)} MA</td></tr><tr><td>Antworten</td><td class="n">${speed(r.one)}</td></tr><tr><td>KI-Modell</td><td class="n">${esc(r.model.n)} · ${CLS[r.cls].n}</td></tr>${p.ref ? `<tr><td>ggü. Einstieg</td><td class="n">${diff(r.capex - p.ref.capex)}, ${diff(r.energy - p.ref.energy)} Strom/J.</td></tr>` : ''}</table><div class="r-note">${p.d}</div></div>`;
+            })
+            .join('');
+          $('report').innerHTML =
+            `<div class="r-head"><div><div class="r-word">KI-<span>Kostenrechner</span></div><div class="r-tag">Hardware, Kosten und Cloud-Vergleich für eigene KI</div></div><div class="r-meta"><b>KI-Kostenrechner</b><br>Ergebnis vom ${dt}</div></div>
+   <h1>Eigene KI${kunde ? ' für ' + kunde : ''}: Ihr Ergebnis</h1><p class="r-sub">Hardware, Kosten und Vergleich mit Online-Diensten auf Basis Ihrer Angaben</p>${stale ? `<p class="r-stale"><b>Veraltete Daten:</b> ${esc(stale)}</p>` : ''}
+   <h2>Empfehlung</h2><div class="r-box">${rec ? `<b>${rec.units > 1 ? rec.units + ' × ' : ''}${esc(rec.s.n)}</b> (${esc(rec.s.kind || '')}) mit dem KI-Modell ${esc(rec.model.n)} (Stufe ${CLS[rec.cls].n}). Einmalig <b>${eur(rec.capex)}</b>, auf ${jahre(I.yrs)} gerechnet einschließlich Strom <b>${eur2(rec.perUser)} pro Mitarbeiter und Monat</b>. Diese Lösung reicht bis ${capTxt(recCap)} Mitarbeitende. ${I.data === 2 ? 'Da Ihre Daten unkritisch sind, wäre auch ein Online-Dienst zulässig.' : 'Ihre Daten bleiben dabei in Ihrem Haus.'}` : 'Mit den gewählten Anforderungen ist derzeit keine Hardware wirtschaftlich darstellbar.'}</div>
+   <h2>Ihre Angaben</h2><table><tbody>
+   <tr><td style="width:36%;color:#5a6676">Daten</td><td>${d.n} – ${d.d}</td></tr>
+   <tr><td style="color:#5a6676">Aufgaben</td><td>${I.tasks.map((t) => t.n).join(', ') || '–'}${I.agents ? ', automatische Abläufe' : ''}</td></tr>
+   <tr><td style="color:#5a6676">Benötigte KI-Stärke</td><td>${CLS[I.cls].n} – ${CLS_PLAIN[I.cls]}</td></tr>
+   <tr><td style="color:#5a6676">Mitarbeitende · Nutzung</td><td>${I.N} · ${INT.find((x) => x.v === I.int).n.toLowerCase()}</td></tr></tbody></table>
+   <h2>Möglichkeiten</h2><div class="r-pk">${pk}</div>
+   <h2>Eigene KI oder Online-Dienst?</h2><table><thead><tr><th>Variante</th><th>pro Mitarbeiter/Monat</th><th>Ihre Daten</th></tr></thead><tbody>
+   <tr><td>Online-Dienst, Abrechnung nach Nutzung (${esc(cl.c.n)})</td><td class="n">${eur2(cl.perUser)}</td><td>${sens ? 'bei Ihren Daten kritisch' : 'bei einem externen Anbieter'}</td></tr>
+   <tr><td>Online-Dienst, Abo pro Arbeitsplatz</td><td class="n">${eur2(saas)}</td><td>${sens ? 'bei Ihren Daten kritisch' : 'bei einem externen Anbieter'}</td></tr>
+   ${rec ? `<tr><td><b>Eigene KI (Empfehlung)</b></td><td class="n"><b>${eur2(rec.perUser)}</b></td><td>bleiben im Haus</td></tr>` : ''}</tbody></table>
+   <p class="r-note">Die Abrechnung nach Nutzung ist bei kleinen Teams fast immer am günstigsten. Eigene KI lohnt sich durch Datenschutz, Unabhängigkeit und planbare Kosten.</p>
+   <h2>So gehen Sie sicher vor</h2><p>1. Vier Wochen Testphase auf gemieteter Rechenleistung für rund ${eur(cost)}${sens ? ' (mit anonymisierten Beispieldaten)' : ''}. 2. Entscheidung mit echten Erfahrungswerten. 3. Einrichtung und Anbindung an Ihre Programme.</p>
+   <div class="r-cta"><b>Nächster Schritt:</b> Ergebnis vor einer Anschaffung mit der eigenen IT oder einem IT-Dienstleister prüfen und zuerst auf gemieteter Rechenleistung testen.</div>
+   <p class="r-note" style="margin-top:12px">Preise: Neupreise in Deutschland inkl. MwSt., Stand ${STAND}. Hardwarepreise schwanken derzeit stark. Nicht enthalten: Einrichtung, Betreuung, Anbindung. Richtwerte, kein verbindliches Angebot.</p>
+   <div class="r-foot"><span>KI-Kostenrechner · Richtwerte, kein verbindliches Angebot</span><span>${dt}</span></div>`;
+        }
+        $('pdf').onclick = () => {
+          run();
+          window.print();
+        };
+      }
+
+      /* ===== Technical view: interaction, animation, matrix, import ===== */
+      {
+        /* ---------- SVG ---------- */
+        const NS = 'http://www.w3.org/2000/svg',
+          svg = document.getElementById('scene');
+        function el(t, a, p) {
+          const e = document.createElementNS(NS, t);
+          for (const k in a) e.setAttribute(k, a[k]);
+          (p || svg).appendChild(e);
+          return e;
+        }
+        function tx(x, y, s, cls, anchor, p) {
+          const e = el('text', { x, y, class: cls, 'text-anchor': anchor || 'middle' }, p);
+          e.textContent = s;
+          return e;
+        }
+        const defs = el('defs', {});
+        const mk = el(
+          'marker',
+          { id: 'arr', viewBox: '0 0 10 10', refX: 8, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto' },
+          defs,
+        );
+        el('path', { d: 'M0 0L10 5L0 10z', fill: 'var(--ok)' }, mk);
+        el('line', { x1: 105, y1: 90, x2: 105, y2: 120, class: 'link' });
+        el('line', { x1: 190, y1: 205, x2: 240, y2: 205, class: 'link' });
+        const pcT = tx(215, 195, 'PCIe', 'sub');
+        tx(215, 224, 'Link', 'sub');
+        el('line', { x1: 105, y1: 290, x2: 105, y2: 310, class: 'link' });
+        el('line', {
+          x1: 940,
+          y1: 210,
+          x2: 960,
+          y2: 210,
+          stroke: 'var(--ok)',
+          'stroke-width': 2.5,
+          'marker-end': 'url(#arr)',
+        });
+        const loopP = el('path', {
+          d: 'M1022 175V40H830V86',
+          fill: 'none',
+          stroke: 'var(--ok)',
+          'stroke-width': 2,
+          'stroke-dasharray': '6 5',
+          'marker-end': 'url(#arr)',
+        });
+        const loopT = tx(926, 32, 'Ausgabe wird nächster Input (autoregressiv)', 'sub');
+        el('rect', { x: 20, y: 30, width: 170, height: 60, rx: 8, class: 'box ssd' });
+        tx(105, 55, 'SSD / NVMe', 'ttl');
+        tx(105, 73, 'nur beim Laden', 'sub');
+        el('rect', { x: 20, y: 120, width: 170, height: 170, rx: 8, class: 'box ram' });
+        tx(105, 140, 'System-RAM', 'ttl');
+        const ramS = tx(105, 156, '', 'sub');
+        const cpuBox = el('rect', { x: 20, y: 310, width: 170, height: 70, rx: 8, class: 'box cpu' });
+        tx(105, 336, 'CPU', 'ttl');
+        tx(105, 354, 'rechnet ausgelagerte', 'sub');
+        tx(105, 368, 'Schichten (Offload)', 'sub');
+        el('rect', { x: 240, y: 30, width: 380, height: 355, rx: 10, class: 'box mem' });
+        const memT = tx(410, 54, '', 'ttl'),
+          memS = tx(410, 72, '', 'sub');
+        const gridT = tx(262, 88, '', 'sub', 'start');
+        const draftG = el('g', { visibility: 'hidden' });
+        const draftR = el(
+          'rect',
+          {
+            x: 562,
+            y: 38,
+            width: 50,
+            height: 32,
+            rx: 5,
+            fill: 'var(--draft)',
+            opacity: 0.8,
+            stroke: 'var(--ink)',
+            'stroke-width': 0,
+          },
+          draftG,
+        );
+        tx(587, 58, 'Draft', 'sub', null, draftG).setAttribute('fill', '#fff');
+        const bus = el('rect', { x: 620, y: 200, width: 100, height: 20, fill: 'var(--mem)', opacity: 0.35, rx: 3 });
+        tx(670, 150, 'Speicherbus', 'ttl');
+        const busT = tx(670, 167, '', 'sub');
+        el('rect', { x: 720, y: 90, width: 220, height: 265, rx: 10, class: 'box comp' });
+        const compT = tx(830, 110, '', 'ttl');
+        el('rect', { x: 732, y: 120, width: 196, height: 24, rx: 4, fill: 'var(--comp)', opacity: 0.25 });
+        tx(830, 136, 'Cache / SRAM (klein, sehr schnell)', 'sub');
+        const cores = [];
+        for (let r = 0; r < 7; r++)
+          for (let c = 0; c < 10; c++)
+            cores.push({
+              e: el('rect', {
+                x: 732 + c * 20,
+                y: 154 + r * 20,
+                width: 16,
+                height: 16,
+                rx: 3,
+                fill: 'var(--comp)',
+                opacity: 0.15,
+              }),
+              lit: -1e9,
+            });
+        tx(732, 312, 'Auslastung Rechenwerke', 'sub', 'start');
+        const utilT = tx(928, 312, '', 'sub', 'end');
+        el('rect', { x: 732, y: 320, width: 196, height: 12, rx: 6, fill: 'var(--panel)', stroke: 'var(--line)' });
+        const utilBar = el('rect', { x: 732, y: 320, width: 0, height: 12, rx: 6, fill: 'var(--comp)' });
+        const tokBox = el('rect', { x: 960, y: 175, width: 125, height: 72, rx: 10, class: 'box tok' });
+        const tokL = tx(1022, 195, 'neues Token', 'sub');
+        const tokT = tx(1022, 228, '', 'big');
+        const kvL = tx(262, 342, '', 'sub', 'start');
+        const kvT = tx(614, 342, '', 'sub', 'end');
+        el('rect', { x: 262, y: 350, width: 352, height: 22, rx: 4, fill: 'var(--panel)', stroke: 'var(--kv)' });
+        const kvBar = el('rect', { x: 262, y: 350, width: 0, height: 22, rx: 4, fill: 'var(--kv)', opacity: 0.7 });
+        const blocks = [];
+        for (let i = 0; i < NB; i++) {
+          const c = i % 8,
+            r = Math.floor(i / 8);
+          const slot = el('rect', {
+            x: 262 + c * 44,
+            y: 94 + r * 58,
+            width: 38,
+            height: 50,
+            rx: 4,
+            fill: 'none',
+            stroke: 'var(--mem)',
+            'stroke-dasharray': '3 3',
+            opacity: 0.5,
+          });
+          const g = el('rect', {
+            x: 262 + c * 44,
+            y: 94 + r * 58,
+            width: 38,
+            height: 50,
+            rx: 4,
+            fill: 'var(--mem)',
+            opacity: 0.12,
+            stroke: 'var(--ink)',
+            'stroke-width': 0,
+          });
+          const rr = el('rect', {
+            x: 31 + c * 19,
+            y: 168 + r * 28,
+            width: 15,
+            height: 22,
+            rx: 2,
+            fill: 'var(--ram)',
+            opacity: 0,
+            stroke: 'var(--ink)',
+            'stroke-width': 0,
+          });
+          blocks.push({
+            slot,
+            g,
+            rr,
+            home: 'gpu',
+            act: -1e9,
+            filled: false,
+            gc: [281 + c * 44, 119 + r * 58],
+            rc: [38.5 + c * 19, 179 + r * 28],
+          });
+        }
+        const ov = el('g', { visibility: 'hidden' });
+        el('rect', { x: 240, y: 30, width: 380, height: 355, rx: 10, fill: 'var(--warn)', opacity: 0.88 }, ov);
+        const ovH = tx(430, 195, '', 'ttl', null, ov);
+        ovH.setAttribute('fill', '#fff');
+        const ovT = tx(430, 216, '', 'lbl', null, ov);
+        ovT.setAttribute('fill', '#fff');
+        const pLayer = el('g', {});
+
+        /* ---------- Particles ---------- */
+        let parts = [];
+        function along(pts, f) {
+          let Ls = [],
+            T = 0;
+          for (let i = 1; i < pts.length; i++) {
+            const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+            Ls.push(d);
+            T += d;
+          }
+          let x = f * T;
+          for (let i = 0; i < Ls.length; i++) {
+            if (x <= Ls[i]) {
+              const g = Ls[i] ? x / Ls[i] : 0;
+              return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * g, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * g];
+            }
+            x -= Ls[i];
+          }
+          return pts[pts.length - 1];
+        }
+        function spawn(now, pts, dur, color, r, delay, done, label) {
+          const e = label
+            ? el('text', { class: 'lbl', 'text-anchor': 'middle', opacity: 0 }, pLayer)
+            : el('circle', { r: r || 4, fill: color, opacity: 0 }, pLayer);
+          if (label) e.textContent = label;
+          parts.push({ e, pts, t0: now + (delay || 0), dur, done, label: !!label });
+        }
+        function updParts(now) {
+          for (let i = parts.length - 1; i >= 0; i--) {
+            const p = parts[i],
+              f = (now - p.t0) / p.dur;
+            if (f < 0) continue;
+            if (f >= 1) {
+              p.e.remove();
+              parts.splice(i, 1);
+              p.done && p.done(now);
+              continue;
+            }
+            const [x, y] = along(p.pts, f);
+            p.e.setAttribute(p.label ? 'x' : 'cx', x);
+            p.e.setAttribute(p.label ? 'y' : 'cy', y);
+            p.e.setAttribute('opacity', 1);
+          }
+        }
+        const rndCore = () => {
+          const c = cores[Math.floor(Math.random() * cores.length)].e;
+          return [+c.getAttribute('x') + 8, +c.getAttribute('y') + 8];
+        };
+
+        /* ---------- State ---------- */
+        let R,
+          phase = 'load',
+          t0 = 0,
+          paused = false,
+          pauseAt = 0,
+          loadNext = 0,
+          preNext = 0,
+          rd = null,
+          tokI = 0,
+          draftAct = -1e9;
+        const WORDS =
+          'Jedes neue Token zieht die nötigen Gewichte einmal durch den Speicherbus – deshalb zählt Bandbreite , bei MoE nur die aktiven Experten .'.split(
+            ' ',
+          );
+        const word = () => WORDS[tokI++ % WORDS.length];
+        const PROMPT = ['Wo', 'läuft', 'es', 'am', 'besten', '?'];
+        const DECQ = [
+          ['Dringend?', 'ja'],
+          ['Kategorie?', 'Rechnung'],
+          ['Spam?', 'nein'],
+          ['Stimmung?', 'neutral'],
+          ['Antwort nötig?', 'ja'],
+        ];
+        let decI = 0;
+        const out = document.getElementById('out'),
+          cap = document.getElementById('cap');
+        function addSpan(t, cls) {
+          const s = document.createElement('span');
+          s.textContent = t + ' ';
+          if (cls) s.className = cls;
+          out.appendChild(s);
+          while (out.children.length > 70) out.removeChild(out.firstChild);
+          return s;
+        }
+
+        function layout() {
+          R = calc();
+          const spill = R.fits && R.ram > 0 ? clamp(Math.round((NB * R.ram) / R.tot), 1, NB) : 0;
+          blocks.forEach((b, i) => {
+            b.home = i >= NB - spill ? 'ram' : 'gpu';
+            b.slot.setAttribute('visibility', b.home === 'ram' ? 'visible' : 'hidden');
+          });
+          paintBlocks();
+          memT.textContent = R.h.mem;
+          memS.textContent =
+            `${R.h.cap} GB (nutzbar ${fmt(R.cap, 0)}) · belegt ${fmt(Math.min(R.tot, R.cap))} GB` +
+            (R.ram > 0 ? ` · ${fmt(R.ram)} GB ausgelagert` : '');
+          ramS.textContent = R.h.unified ? '= Hauptspeicher (kein Offload)' : `Offload-Ziel · ~${R.sBw} GB/s`;
+          gridT.textContent = R.moe
+            ? `Gewichte als Experten-Blöcke – pro Token nur ${fmt((100 * R.m.a) / R.m.p, 0)} % aktiv`
+            : 'Gewichte, Schicht 1 → N';
+          draftG.setAttribute('visibility', S.mode === 'spec' ? 'visible' : 'hidden');
+          compT.textContent = R.h.comp;
+          const bh = 6 + (40 * Math.log(Math.max(R.h.bw, 12) / 12)) / Math.log(3350 / 12);
+          bus.setAttribute('y', 210 - bh / 2);
+          bus.setAttribute('height', bh);
+          busT.textContent = `${R.h.bw.toLocaleString('de-DE')} GB/s`;
+          kvL.textContent =
+            S.mode === 'dec' ? 'KV-Cache des Prompts (wird nur geschrieben)' : 'KV-Cache (wächst mit Kontext × Batch)';
+          kvBar.setAttribute('width', 352 * clamp(R.KV / R.tot, 0, 1));
+          kvT.textContent = `${fmt(R.KV, 2)} GB`;
+          ov.setAttribute('visibility', R.fits ? 'hidden' : 'visible');
+          ovH.textContent = R.h.hailo && !R.m.hailo ? 'Läuft nicht auf Hailo-10H' : 'Passt nicht in den Speicher';
+          ovT.textContent = R.why;
+          tokL.textContent = {
+            std: 'neues Token',
+            spec: 'Draft → Prüfung',
+            diff: 'Block entrauschen',
+            dec: 'Entscheidung',
+          }[S.mode];
+          loopP.setAttribute('visibility', S.mode === 'dec' ? 'hidden' : 'visible');
+          loopT.setAttribute('visibility', S.mode === 'dec' ? 'hidden' : 'visible');
+          stats();
+          chart();
+          matrix();
+        }
+        function paintBlocks() {
+          blocks.forEach((b) => {
+            b.g.setAttribute('opacity', b.home === 'gpu' ? (b.filled ? 0.85 : 0.12) : 0);
+            b.rr.setAttribute('opacity', b.home === 'ram' && b.filled ? 0.9 : 0);
+          });
+        }
+
+        function stats() {
+          const r = R,
+            u = unit();
+          $('kpi').innerHTML = r.fits
+            ? `≈ ${fT(r.stream)} <small>${u} pro Anfrage</small>`
+            : `— <small>${r.why}</small>`;
+          let extra = '';
+          if (r.fits) {
+            if (r.meas != null)
+              extra += `Hersteller-Messung: ${fmt(r.meas, 2)} Token/s (${fmt((100 * r.meas) / r.stream, 0)} % der Obergrenze). `;
+            if (r.h.effTxt && S.mode === 'std')
+              extra += `Kalibriert (${r.h.effTxt}) → real ≈ ${fT(r.stream * r.h.eff)} ${u}. `;
+            if (r.h.procWarn) extra += r.h.procWarn + ' ';
+            if (r.B > 1) extra += `Gesamt: ≈ ${fmt(r.agg, 0)} ${u} über ${r.B} Anfragen. `;
+            extra += `Flaschenhals: ${r.compBound ? 'Rechenleistung' : r.ram > 0 ? 'System-RAM (Offload)' : 'Speicherbandbreite'}.`;
+            if (S.mode === 'spec') extra += ` Spekulativ: ×${fmt(r.E, 2)} gemessen (${r.m.spec.n}).`;
+            if (S.mode === 'diff')
+              extra += ` ${L} Tokens in ${STEPS} Schritten = ${L / STEPS} Tokens pro Gewichts-Lesedurchgang.`;
+            if (S.mode === 'dec')
+              extra +=
+                ` Prompt-Verarbeitung ≈ ${fmt(r.promptTps, 0)} Token/s · Latenz ≈ ${fmt(r.T * 1000, 0)} ms.` +
+                (r.m.dec ? '' : ' (Modell ist kein natives Decision-Modell – Wert zeigt nur die Hardware-Grenze.)');
+            if (r.m.maxCtx && CTX[S.ctx] > r.m.maxCtx)
+              extra += ` Kontext auf ${r.m.maxCtx.toLocaleString('de-DE')} begrenzt (Modell-Maximum).`;
+          }
+          $('kpi2').textContent = extra;
+          const per = S.mode === 'dec' ? 'Entscheidung' : 'Token';
+          $('bMemL').textContent = `Speicher lesen / ${per}`;
+          $('bCompL').textContent = `Rechnen / ${per}`;
+          const tm = r.tm / r.tpr,
+            tc = r.tc / r.tpr,
+            mx = Math.max(tm, tc);
+          $('bMem').style.width = (100 * tm) / mx + '%';
+          $('bComp').style.width = (100 * tc) / mx + '%';
+          $('vMem').textContent = fmt(tm * 1000, 2) + ' ms';
+          $('vComp').textContent = fmt(tc * 1000, 2) + ' ms';
+          let f;
+          if (S.mode === 'std')
+            f =
+              `Token/s ≈ Bandbreite ÷ GB pro Token<br>= ${r.h.bw} GB/s ÷ ${fmt(r.P.R, 2)} GB` +
+              (r.moe
+                ? ` <span style="color:var(--mute)">(nur aktive Experten: ${fmt(r.P.W, 2)} von ${fmt(r.Wt, 1)} GB)</span>`
+                : '');
+          else if (S.mode === 'spec')
+            f = `Token/s = Standard × gemessener Beschleunigungsfaktor<br>= ${fmt(r.P.R > 0 ? 1 / r.P.t : 0, 1)} × ${fmt(r.E, 2)} (${r.m.spec.n}, Quelle: Unsloth-Doku)`;
+          else if (S.mode === 'diff')
+            f = `Token/s = ${L} Tokens ÷ (${STEPS} Schritte × t_Schritt)<br>= ${L} ÷ (${STEPS} × ${fmt(r.P.t * 1000, 2)} ms)`;
+          else
+            f = `Zeit/Entscheidung = max(Gewichte ÷ Bandbreite ; 2 × Param. × Prompt-Tokens ÷ Rechenleistung)<br>= max(${fmt(r.P.tm * 1000, 1)} ms ; ${fmt(r.P.tc * 1000, 1)} ms) → hier zählt ${r.compBound ? '<b>Rechenleistung</b>' : '<b>Bandbreite</b>'}`;
+          if (r.ram > 0) f += `<br>davon ${fmt(r.ram)} GB im System-RAM mit ${r.sBw} GB/s → dominiert`;
+          $('formula').innerHTML = f;
+          $('modes').innerHTML =
+            `<div class="on"><b>${fmt(CTX[S.ctx] / 1024, 0)}k</b>Kontext (fest)</div><div><b>1</b>Nutzer</div><div><b>${esc(r.m.v[S.quant].n)}</b>Variante</div><div><b>${r.m.dec ? 'Decision' : S.mode === 'spec' ? 'Spekulativ' : 'Standard'}</b>Verfahren</div>`;
+        }
+        function chart() {
+          const rs = HW.map((h, i) => calc(i)),
+            ok = rs.filter((r) => r.fits),
+            mx = Math.max(...ok.map((r) => r.stream), 1);
+          document.getElementById('chartL').textContent = `Gleiches Setup auf allen Geräten (${unit()} pro Anfrage)`;
+          document.getElementById('chart').innerHTML = rs
+            .map((r, i) => {
+              const col = !r.fits
+                ? 'var(--line)'
+                : r.compBound
+                  ? 'var(--comp)'
+                  : r.ram > 0
+                    ? 'var(--ram)'
+                    : 'var(--mem)';
+              return `<div class="row"><span class="n ${i === S.hw ? 'hl' : ''}">${esc(r.h.name)}</span><span class="b"><i style="width:${r.fits ? (100 * r.stream) / mx : 0}%;background:${col}"></i></span><span class="v">${r.fits ? fT(r.stream) : '—'}</span></div>`;
+            })
+            .join('');
+        }
+        function matrix() {
+          const idx = MODELS.map((m, j) => j).filter((j) => S.grp === 'alle' || MODELS[j].g === S.grp);
+          const pick = (i, j) => {
+            const m = MODELS[j],
+              md = effMode(m);
+            const order = m.v.map((v, k) => k).sort((a, b) => m.v[b].gb - m.v[a].gb);
+            let best = null;
+            for (const k of order) {
+              const c = calc(i, j, md, k);
+              if (c.fits && c.ram === 0) {
+                c.vn = m.v[k].n;
+                return c;
+              }
+              if (c.fits) best = { ...c, vn: m.v[k].n };
+            }
+            return best || calc(i, j, md, 0);
+          };
+          const grid = HW.map((h, i) => idx.map((j) => pick(i, j)));
+          const best = idx.map((j, k) => {
+            let bi = -1,
+              bv = 0;
+            grid.forEach((row, i) => {
+              if (row[k].fits && row[k].stream > bv) {
+                bv = row[k].stream;
+                bi = i;
+              }
+            });
+            return bi;
+          });
+          document.getElementById('matL').textContent =
+            `② Auswertungsmatrix: ${unit()} pro Anfrage (aktuelle Quantisierung, Kontext, Batch, Verfahren)`;
+          let h =
+            '<table><thead><tr><th>Gerät</th><th>GB/s</th><th>GB</th>' +
+            idx
+              .map((j) => `<th class="${j === S.model ? 'hl' : ''}">${MODELS[j].s}${MODELS[j].dec ? ' ◆' : ''}</th>`)
+              .join('') +
+            '</tr></thead><tbody>';
+          grid.forEach((row, i) => {
+            h += `<tr class="${i === S.hw ? 'cur' : ''}"><td>${esc(HW[i].name)}${HW[i].est ? ' ≈' : ''}</td><td>${HW[i].bw.toLocaleString('de-DE')}</td><td>${HW[i].cap}</td>`;
+            row.forEach((c, k) => {
+              h += `<td class="${best[k] === i ? 'best' : ''}" style="${c.fits ? '' : 'color:var(--mute)'}" title="${esc(c.fits ? c.vn || '' : c.why)}">${c.fits ? fT(c.stream) + (c.ram > 0 ? '*' : '') + (MODELS[idx[k]].v.length > 1 ? `<br><span class="meas" style="color:var(--mute)">${c.vn}</span>` : '') + (c.meas != null ? `<br><span class="meas">gem. ${fmt(c.meas, 1)}</span>` : '') + (c.h.eff && S.mode === 'std' ? `<br><span class="meas">real ≈ ${fT(c.stream * c.h.eff)}</span>` : '') : '—'}</td>`;
+            });
+            h += '</tr>';
+          });
+          document.getElementById('matrix').innerHTML =
+            h +
+            '</tbody></table>' +
+            '<div class="note">◆ = natives Decision-Modell. Ausgegrauter Strich: Maus drüber zeigt den Grund.</div>';
+        }
+
+        function setCap() {
+          const r = R,
+            u = (x) => fmt(x * 100, x < 0.1 ? 1 : 0);
+          const spillTxt =
+            r.ram > 0
+              ? ` <b style="color:var(--ram)">${fmt(r.ram)} GB liegen im System-RAM → diese Teile laufen mit ~${r.sBw} GB/s und fressen die meiste Zeit.</b>`
+              : '';
+          const hailoTxt = r.h.hailo
+            ? ' Der Hailo-10H liest die Gewichte aus seinem eigenen 8-GB-LPDDR4X (~17 GB/s, 32 Bit) – 40 TOPS helfen nicht, wenn der Speicher bremst.'
+            : '';
+          if (phase === 'load')
+            cap.innerHTML = `<b>① Laden (einmalig):</b> Gewichte wandern von der SSD in den Speicher (${esc(r.h.mem)}). Danach ist die SSD raus – sie bremst die Token-Rate nicht.`;
+          else if (phase === 'prefill')
+            cap.innerHTML = `<b>② Prefill:</b> Alle Prompt-Tokens werden gemeinsam verrechnet. Gewichte einmal lesen, für viele Tokens nutzen → Rechenwerke voll ausgelastet. Hier zählt Rechenleistung (Zeit bis zum ersten Token).`;
+          else if (!r.fits) cap.innerHTML = `<b>③ Läuft nicht:</b> ${r.why}.`;
+          else if (S.mode === 'std')
+            cap.innerHTML =
+              `<b>③ Decode:</b> Für <u>jedes</u> Token müssen ${fmt(r.P.R, 2)} GB über den Bus – ` +
+              (r.moe
+                ? `bei MoE nur die aktiven Experten (${fmt(r.P.W, 2)} von ${fmt(r.Wt, 1)} GB) plus KV-Cache.`
+                : `alle Gewichte plus KV-Cache.`) +
+              ` Rechenwerke nur ${u(r.P.util)} % ausgelastet – sie warten auf Daten.` +
+              hailoTxt +
+              spillTxt;
+          else if (S.mode === 'spec')
+            cap.innerHTML =
+              `<b>③ Spekulatives Decoding:</b> Das Modell schlägt mehrere Tokens im Voraus vor (${r.m.spec.n}, gelb) und prüft sie in <u>einem</u> Durchgang – die Gewichte werden einmal gelesen, aber mehrere Tokens gewonnen. Gemessener Effekt laut Unsloth: ×${fmt(r.E, 2)}.` +
+              spillTxt;
+          else if (S.mode === 'diff')
+            cap.innerHTML =
+              `<b>③ Diffusion-LLM:</b> Statt Token für Token wird ein Block aus ${L} Tokens in ${STEPS} Schritten gleichzeitig „entrauscht". Jeder Schritt liest die Gewichte einmal, rechnet aber für ${L} Tokens → Rechenwerke ${u(r.P.util)} % ausgelastet. Bandbreite verliert an Gewicht, Rechenleistung gewinnt.` +
+              spillTxt;
+          else
+            cap.innerHTML =
+              `<b>③ Decision-Modell:</b> Kein Token für Token. Prompt und Fragen laufen in <u>einem</u> Vorwärtsdurchgang, das Modell bewertet nur die erlaubten Antworten und liefert Wahrscheinlichkeiten. Das ist ein reiner Prefill → ${r.compBound ? '<b>Rechenleistung</b> entscheidet' : 'bei kurzem Prompt entscheidet noch die Bandbreite'} (Rechenwerke ${u(r.P.util)} %).` +
+              spillTxt;
+        }
+
+        function restart() {
+          parts.forEach((p) => p.e.remove());
+          parts = [];
+          blocks.forEach((b) => (b.filled = false));
+          out.innerHTML = '';
+          tokT.textContent = '';
+          tokI = 0;
+          rd = null;
+          phase = 'load';
+          t0 = performance.now();
+          loadNext = 0;
+          preNext = 0;
+          layout();
+          setCap();
+          if (paused) pauseAt = performance.now(); // otherwise the paused time would count against the new start when resuming
+        }
+        function subset(frac) {
+          const all = [...Array(NB).keys()];
+          if (frac >= 0.995) return all;
+          const n = Math.max(1, Math.round(NB * frac));
+          return all
+            .sort(() => Math.random() - 0.5)
+            .slice(0, n)
+            .sort((a, b) => a - b);
+        }
+        function newRound(now) {
+          const r = R,
+            steps = [];
+          if (S.mode === 'std') steps.push({ kind: 'full', real: r.P.t, util: r.P.util, blocks: subset(r.P.frac) });
+          else if (S.mode === 'spec') {
+            for (let k = 0; k < K; k++) steps.push({ kind: 'draft', real: r.Pdr.t, util: r.Pdr.util, blocks: [] });
+            steps.push({ kind: 'verify', real: r.P.t, util: r.P.util, blocks: subset(r.P.frac) });
+          } else if (S.mode === 'diff')
+            for (let s = 0; s < STEPS; s++)
+              steps.push({ kind: 'diff', real: r.P.t, util: r.P.util, blocks: subset(r.P.frac), idx: s });
+          else steps.push({ kind: 'dec', real: r.P.t, util: r.P.util, blocks: subset(r.P.frac) });
+          const T = steps.reduce((a, s) => a + s.real, 0),
+            vis = clamp(900 * Math.sqrt((1000 * T) / 5), 500, 9000);
+          let acc = 0;
+          steps.forEach((s) => {
+            s.dur = Math.max(s.kind === 'draft' ? 220 : 300, (vis * s.real) / T);
+            s.start = acc;
+            acc += s.dur;
+            const w = s.blocks.map((i) => (blocks[i].home === 'ram' ? r.h.bw / r.sBw : 1)),
+              ws = w.reduce((a, b) => a + b, 0) || 1;
+            let a2 = 0;
+            s.bst = [];
+            s.bdur = [];
+            w.forEach((x) => {
+              s.bst.push(a2);
+              const d = (s.dur * 0.85 * x) / ws;
+              s.bdur.push(d);
+              a2 += d;
+            });
+            s.fired = 0;
+            s.done = false;
+          });
+          rd = { t0: now, steps, total: acc, ghosts: [], masks: [] };
+          if (S.mode === 'diff') {
+            for (let i = 0; i < LVIS; i++) rd.masks.push(addSpan('▒▒▒', 'mask'));
+            tokT.textContent = '0/' + STEPS;
+          }
+          if (S.mode === 'dec') {
+            const q = DECQ[decI % DECQ.length];
+            tokT.textContent = '…';
+            ['Mail', '+', q[0]].forEach((w, k) =>
+              spawn(
+                now,
+                [[1022, 250], [1022, 380], [830, 380], [830, 300], rndCore()],
+                Math.min(900, acc * 0.6),
+                null,
+                0,
+                k * 90,
+                null,
+                w,
+              ),
+            );
+          }
+        }
+
+        const LSTEP = 70,
+          LDUR = NB * LSTEP + 900,
+          PSTEP = 55,
+          PDUR = NB * PSTEP + 1400;
+        function tick(now) {
+          requestAnimationFrame(tick);
+          if (paused || !R) return; // before the technical view is first shown there is no state yet
+          const e = now - t0;
+          let util = 0;
+          if (phase === 'load') {
+            while (loadNext < NB && e >= loadNext * LSTEP) {
+              const b = blocks[loadNext],
+                ram = b.home === 'ram';
+              spawn(
+                now,
+                ram ? [[105, 60], [105, 205], b.rc] : [[105, 60], [105, 205], [240, 205], b.gc],
+                ram ? 700 : 900,
+                'var(--ssd)',
+                4,
+                0,
+                () => {
+                  b.filled = true;
+                  paintBlocks();
+                },
+              );
+              loadNext++;
+            }
+            if (e > LDUR) {
+              phase = 'prefill';
+              t0 = now;
+              setCap();
+              PROMPT.forEach((w, k) =>
+                spawn(now, [[1022, 40], [830, 40], [830, 150], rndCore()], 1100, null, 0, k * 150, null, w),
+              );
+            }
+          } else if (phase === 'prefill') {
+            util = e > 500 ? 0.92 : 0;
+            while (preNext < NB && e >= 500 + preNext * PSTEP) {
+              const b = blocks[preNext];
+              b.act = now;
+              for (let k = 0; k < 3; k++)
+                spawn(
+                  now,
+                  b.home === 'ram' ? [b.rc, [105, 345]] : [b.gc, [620, 210], [720, 210], rndCore()],
+                  650,
+                  b.home === 'ram' ? 'var(--ram)' : 'var(--mem)',
+                  3.5,
+                  k * 40,
+                );
+              preNext++;
+            }
+            if (e > PDUR) {
+              phase = 'decode';
+              setCap();
+              newRound(now);
+            }
+          } else if (R.fits && rd) {
+            const ev = now - rd.t0;
+            util = 0.03;
+            for (const s of rd.steps) {
+              if (ev < s.start) break;
+              const se = ev - s.start;
+              if (se < s.dur) util = Math.max(s.util, 0.03);
+              if (s.kind === 'draft' && !s.fired) {
+                s.fired = 1;
+                fireDraft(now, s.dur);
+              }
+              while (s.kind !== 'draft' && s.fired < s.blocks.length && se >= s.bst[s.fired]) {
+                fire(now, s.blocks[s.fired], s.bdur[s.fired]);
+                s.fired++;
+              }
+              if (!s.done && se >= s.dur) {
+                s.done = true;
+                stepEnd(now, s);
+              }
+            }
+            if (ev >= rd.total + 450) newRound(now);
+          }
+          cores.forEach((c) => {
+            if (Math.random() < util * 0.18) c.lit = now;
+            c.e.setAttribute('opacity', Math.max(0.15, 1 - (now - c.lit) / 260));
+          });
+          utilBar.setAttribute('width', 196 * util);
+          utilT.textContent = fmt(util * 100, util < 0.1 && util > 0 ? 1 : 0) + ' %';
+          blocks.forEach((b) =>
+            (b.home === 'ram' ? b.rr : b.g).setAttribute('stroke-width', now - b.act < 220 ? 2.5 : 0),
+          );
+          draftR.setAttribute('stroke-width', now - draftAct < 200 ? 3 : 0);
+          cpuBox.setAttribute('stroke-width', blocks.some((b) => b.home === 'ram' && now - b.act < 220) ? 4 : 1.5);
+          updParts(now);
+        }
+        function fire(now, i, d) {
+          const b = blocks[i];
+          b.act = now;
+          const n = 3;
+          for (let k = 0; k < n; k++) {
+            if (b.home === 'ram')
+              spawn(now, [b.rc, [105, 345]], clamp(d * 1.6, 300, 2200), 'var(--ram)', 4, (k * d) / n);
+            else
+              spawn(
+                now,
+                [b.gc, [620, 210], [720, 210], rndCore()],
+                clamp(d * 2.4, 280, 1400),
+                'var(--mem)',
+                4,
+                (k * d) / n,
+              );
+          }
+          if (b.home === 'gpu')
+            spawn(
+              now,
+              [[262 + 352 * (i / NB), 361], [620, 214], [720, 214], rndCore()],
+              clamp(d * 2.4, 280, 1400),
+              'var(--kv)',
+              3,
+            );
+        }
+        function fireDraft(now, d) {
+          draftAct = now;
+          for (let k = 0; k < 2; k++)
+            spawn(
+              now,
+              [[587, 54], [587, 210], [620, 210], [720, 210], rndCore()],
+              clamp(d * 0.9, 200, 700),
+              'var(--draft)',
+              3.5,
+              (k * d) / 4,
+            );
+        }
+        function flashTok(t) {
+          tokT.textContent = t;
+          tokBox.setAttribute('stroke-width', 4);
+          setTimeout(() => tokBox.setAttribute('stroke-width', 1.5), 250);
+        }
+        function loopDot(now, c) {
+          spawn(
+            now,
+            [
+              [1022, 175],
+              [1022, 40],
+              [830, 40],
+              [830, 90],
+            ],
+            420,
+            c || 'var(--ok)',
+            5,
+          );
+        }
+        function stepEnd(now, s) {
+          if (s.kind === 'full') {
+            const w = word();
+            flashTok(w);
+            addSpan(w);
+            loopDot(now);
+          } else if (s.kind === 'draft') {
+            const w = word();
+            rd.ghosts.push(addSpan(w, 'ghost'));
+            tokT.textContent = 'Draft ' + rd.ghosts.length + '/' + K;
+          } else if (s.kind === 'verify') {
+            let n = clamp(Math.round(R.E - 1 + (Math.random() - 0.5) * 1.6), 0, K);
+            rd.ghosts.forEach((g, i) => {
+              if (i < n) g.className = '';
+              else if (i === n) g.className = 'fix';
+              else g.remove();
+            });
+            tokI -= Math.max(0, K - n - 1);
+            if (n === K) addSpan(word());
+            flashTok(`+${n + 1} Tokens`);
+            loopDot(now);
+          } else if (s.kind === 'diff') {
+            const upto = Math.round((LVIS * (s.idx + 1)) / STEPS);
+            rd.masks.forEach((m, i) => {
+              if (i < upto && m.className === 'mask') {
+                m.className = '';
+                m.textContent = word() + ' ';
+              }
+            });
+            tokT.textContent = s.idx + 1 + '/' + STEPS;
+            if (s.idx === STEPS - 1) {
+              flashTok(`+${L} Tokens`);
+              loopDot(now);
+              addSpan(`[+${L - LVIS} weitere]`, 'mask');
+            }
+          } else {
+            const q = DECQ[decI++ % DECQ.length],
+              p = 70 + Math.floor(Math.random() * 28);
+            flashTok(`${q[1]} · ${p} %`);
+            addSpan(`[${q[0]} → ${q[1]} (${p} %)]`, 'fix');
+          }
+        }
+
+        /* ---------- Interaction ---------- */
+        function hwOptions() {
+          const v = S.hw;
+          $('hw').innerHTML = '';
+          HW.forEach((h, i) =>
+            $('hw').add(
+              new Option(
+                `${h.name} · ${h.bw} GB/s · ${h.cap} GB · ${h.hailo ? '' : fmt(h.tf, h.tf % 1 ? 1 : 0) + ' TFLOPS FP16' + (h.est ? ' ≈' : '') + (h.tops ? ' · ' : '')}${h.tops || ''}`,
+                i,
+              ),
+            ),
+          );
+          $('hw').value = v;
+        }
+        function modelOptions() {
+          const sel = $('model');
+          sel.innerHTML = '';
+          ['Hailo', 'Ollama', 'Frontier', 'Referenz'].forEach((g) => {
+            const og = document.createElement('optgroup');
+            og.label =
+              g === 'Frontier'
+                ? 'Frontier-Modelle (offene Gewichte, lokal per GGUF)'
+                : g === 'Hailo'
+                  ? 'Hailo-10H Model Zoo (v5.3.0)'
+                  : g === 'Ollama'
+                    ? 'Ollama-Bibliothek (aktuell)'
+                    : 'Referenzklassen';
+            MODELS.forEach((m, i) => {
+              if (m.g === g) og.appendChild(new Option(m.name, i));
+            });
+            sel.appendChild(og);
+          });
+          sel.value = S.model;
+        }
+        function renderImp() {
+          const L = HW.filter((h) => h.imported);
+          $('impList').innerHTML = L.map(
+            (h) =>
+              `<div class="imp"><button data-id="${esc(h.id)}">✕</button><span>${esc(h.name)} · ${h.bw} GB/s · ${h.cap} GB${h.effTxt ? ' · ' + esc(h.effTxt) : ''}${h.seed ? ' – Platzhalter, mit hw-profil.sh ersetzen' : ''}</span></div>`,
+          ).join('');
+          $('impList')
+            .querySelectorAll('button')
+            .forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const id = b.dataset.id;
+                  saveProfiles(loadProfiles().filter((x) => devFromProfile(x).id !== id));
+                  const i = HW.findIndex((h) => h.id === id);
+                  HW.splice(i, 1);
+                  if (S.hw >= i) S.hw = Math.max(0, S.hw === i ? 0 : S.hw - 1);
+                  hwOptions();
+                  renderImp();
+                  restart();
+                }),
+            );
+        }
+        $('impBtn').onclick = () => {
+          let p;
+          try {
+            p = JSON.parse($('impTxt').value.trim());
+          } catch (e) {
+            $('impMsg').textContent = 'Kein gültiges JSON.';
+            return;
+          }
+          if (!p || typeof p !== 'object' || Array.isArray(p) || !p.host || !(numOr(p.ram_gb, 0) > 0)) {
+            $('impMsg').textContent = 'Erwartet wird die JSON-Zeile aus hw-profil.sh (mindestens host und ram_gb).';
+            return;
+          }
+          if (p.vram_gb >= 2 && !p.gpu_bw && !gpuSpec(p.gpu_name || '', p.vram_gb)) {
+            const bw = numOr(prompt(`GPU „${p.gpu_name}“ ist unbekannt. Speicherbandbreite in GB/s?`), 0);
+            if (!bw) {
+              $('impMsg').textContent = 'Bandbreite der GPU nicht erkannt, Gerät nicht übernommen.';
+              return;
+            }
+            p.gpu_bw = bw;
+            p.gpu_tf = numOr(prompt('FP16-Rechenleistung in TFLOPS (Schätzung reicht)?', '20'), 20);
+          }
+          if (!(p.ram_bw || p.ram_bw_measured || p.ram_bw_theory)) {
+            const v = prompt('RAM-Bandbreite unbekannt (Skript ohne sudo/sysbench?). Wert in GB/s?', '40');
+            p.ram_bw = +(v || '40').replace(',', '.');
+          }
+          const i = addProfile(p, true);
+          S.hw = i;
+          hwOptions();
+          renderImp();
+          restart();
+          $('impMsg').textContent = `„${HW[i].name}“ übernommen` + (HW[i].effTxt ? ' · ' + HW[i].effTxt : '');
+        };
+        loadProfiles().forEach((p) => {
+          try {
+            if (p && typeof p === 'object' && p.host) addProfile(p, false);
+          } catch (e) {
+            console.warn('Geräteprofil übersprungen', e);
+          }
+        });
+        hwOptions();
+        modelOptions();
+        renderImp();
+        function varOptions() {
+          const m = MODELS[S.model];
+          $('quant').innerHTML = '';
+          m.v.forEach((v, i) =>
+            $('quant').add(new Option(`${v.n} · ${fmt(v.gb, v.gb < 10 ? 2 : 1)} GB${v.est ? ' (geschätzt)' : ''}`, i)),
+          );
+          S.quant = Math.min(S.quant, m.v.length - 1);
+          $('quant').value = S.quant;
+          $('quant').disabled = m.v.length < 2;
+          $('spec').disabled = !m.spec;
+          if (!m.spec) $('spec').checked = false;
+          S.spec = $('spec').checked;
+          $('specL').textContent = m.spec
+            ? `${m.spec.n}, gemessen ×${fmt(m.spec.x, 2)}`
+            : 'für dieses Modell nicht veröffentlicht';
+          S.mode = effMode(m);
+        }
+        varOptions();
+        $('mgrp').value = S.grp;
+        ['hw', 'model', 'quant'].forEach(
+          (k) =>
+            ($(k).onchange = (e) => {
+              S[k] = +e.target.value;
+              if (k === 'model') {
+                S.quant = 0;
+                varOptions();
+                if (MODELS[S.model].g !== S.grp && S.grp !== 'alle') {
+                  S.grp = MODELS[S.model].g;
+                  $('mgrp').value = S.grp;
+                }
+              }
+              restart();
+            }),
+        );
+        function soft() {
+          layout();
+          if (phase !== 'load') {
+            blocks.forEach((b) => (b.filled = true));
+            paintBlocks();
+          }
+          setCap();
+          if (phase === 'decode') {
+            out.querySelectorAll('.ghost,.mask').forEach((x) => x.remove());
+            newRound(performance.now());
+            if (paused) pauseAt = performance.now();
+          }
+        }
+        $('spec').onchange = (e) => {
+          S.spec = e.target.checked;
+          S.mode = effMode(MODELS[S.model]);
+          soft();
+        };
+        $('mgrp').onchange = (e) => {
+          S.grp = e.target.value;
+          matrix();
+        };
+        $('tMacLim').onchange = (e) => {
+          S.macUse = +e.target.value;
+          if (HW[S.hw].mac) restart();
+          else layout();
+        };
+        $('tRestart').onclick = restart;
+        /* Pausing shifts all timestamps so the animation continues seamlessly */
+        function setPaused(on) {
+          if (on === paused) return;
+          const now = performance.now();
+          paused = on;
+          $('pause').textContent = paused ? '▶ Weiter' : '❚❚ Pause';
+          if (paused) pauseAt = now;
+          else {
+            const d = now - pauseAt;
+            t0 += d;
+            if (rd) rd.t0 += d;
+            parts.forEach((p) => (p.t0 += d));
+            blocks.forEach((b) => (b.act += d));
+          }
+        }
+        $('pause').onclick = () => setPaused(!paused);
+        const HWPROF =
+          '#!/usr/bin/env bash\n# hw-profil.sh \u2013 sammelt LLM-relevante Hardwaredaten als JSON (nur lesend, \u00e4ndert nichts)\n# Aufruf:  sudo bash hw-profil.sh [ollama-modell]\n# Beispiel: sudo bash hw-profil.sh qwen3.8:27b\n# Optional f\u00fcr gemessene RAM-Bandbreite: sudo apt install sysbench\n# Ausgabe: eine JSON-Zeile \u2192 auf der Seite "Wie KI-Hardware arbeitet" unter "Eigene Ger\u00e4te" einf\u00fcgen.\nset -u\nMODEL="${1:-}"\nlog(){ printf \'%s\\n\' "$*" >&2; }\nesc(){ printf \'%s\' "${1:-}" | tr -d \'\\n\' | sed \'s/\\\\/\\\\\\\\/g; s/"/\\\\"/g\'; }\nn(){ v=$(printf \'%s\' "${1:-}" | grep -oE \'[0-9]+([.][0-9]+)?\' | head -1); printf \'%s\' "${v:-null}"; }\n\nlog "\u25b6 Sammle Systemdaten \u2026"\nHOST=$(hostname -s)\nOS=$(. /etc/os-release 2>/dev/null; printf \'%s\' "${PRETTY_NAME:-unbekannt}")\nBOARD=$( { tr -d \'\\0\' </proc/device-tree/model; } 2>/dev/null || cat /sys/class/dmi/id/product_name 2>/dev/null)\n\n# CPU\nCPU=$(lscpu | sed -n \'s/^Model name:[[:space:]]*//p\' | head -1)\nCORES=$(lscpu -p=CORE 2>/dev/null | grep -v \'^#\' | sort -u | wc -l)\nTHREADS=$(nproc)\nMHZ=$(lscpu | sed -n \'s/^CPU max MHz:[[:space:]]*//p\' | head -1)\n[ -z "$MHZ" ] && MHZ=$(lscpu | sed -n \'s/^CPU MHz:[[:space:]]*//p\' | head -1)\n[ -z "$MHZ" ] && MHZ=$(printf \'%s\' "$CPU" | grep -oE \'[0-9.]+ ?GHz\' | grep -oE \'[0-9.]+\' | awk \'{printf "%d",$1*1000}\')\nFLAGS=$(grep -m1 -oE \'avx512f|avx2|asimd\' /proc/cpuinfo | sort -u | tr \'\\n\' \' \' | sed \'s/ $//\')\n\n# RAM\nRAM_GB=$(awk \'/MemTotal/{printf "%.1f",$2/1048576}\' /proc/meminfo)\nMODS="" RTYPE="" SPEED="" WIDTH="" THEO=""\nif [ "$(id -u)" = 0 ] && command -v dmidecode >/dev/null; then\n  DMI=$(dmidecode -t 17 2>/dev/null)\n  MODS=$(printf \'%s\\n\' "$DMI" | grep -cE \'^[[:space:]]+Size: [0-9]\')\n  RTYPE=$(printf \'%s\\n\' "$DMI" | sed -n \'s/^[[:space:]]*Type: \\(.*\\)$/\\1/p\' | grep -viE \'unknown|other\' | head -1)\n  SPEED=$(printf \'%s\\n\' "$DMI" | sed -n \'s/^[[:space:]]*Configured Memory Speed: \\([0-9][0-9]*\\).*/\\1/p\' | head -1)\n  [ -z "$SPEED" ] && SPEED=$(printf \'%s\\n\' "$DMI" | sed -n \'s/^[[:space:]]*Speed: \\([0-9][0-9]*\\).*/\\1/p\' | head -1)\n  WIDTH=$(printf \'%s\\n\' "$DMI" | sed -n \'s/^[[:space:]]*Data Width: \\([0-9][0-9]*\\) bits.*/\\1/p\' | head -1)\nelif [ "$(id -u)" != 0 ]; then\n  log "  Hinweis: ohne sudo keine RAM-Riegel-Daten (dmidecode)."\nfi\ncase "$BOARD" in *"Raspberry Pi 5"*) RTYPE="LPDDR4X"; SPEED=4267; WIDTH=32; MODS=1;; esac\nif [ -n "$MODS" ] && [ -n "$SPEED" ] && [ -n "$WIDTH" ] && [ "$MODS" -gt 0 ]; then\n  CH=$MODS; [ "$CH" -gt 2 ] && CH=2   # Desktop/Notebook: max. 2 Kan\u00e4le; Server bitte im JSON korrigieren\n  THEO=$(awk -v c="$CH" -v s="$SPEED" -v w="$WIDTH" \'BEGIN{printf "%.1f", c*s*w/8/1000}\')\nfi\nMEAS=""\nif command -v sysbench >/dev/null; then\n  log "\u25b6 Messe RAM-Bandbreite (sysbench, ca. 10 s) \u2026"\n  MIB=$(sysbench memory --memory-block-size=1M --memory-total-size=64G --memory-oper=read --threads="$THREADS" --time=10 run 2>/dev/null | grep -oE \'[0-9.]+ MiB/sec\' | grep -oE \'[0-9.]+\' | head -1)\n  [ -n "$MIB" ] && MEAS=$(awk -v m="$MIB" \'BEGIN{printf "%.1f", m*1.048576/1000}\')\nelse\n  log "  Hinweis: sysbench fehlt \u2192 keine gemessene RAM-Bandbreite (apt install sysbench)."\nfi\n\n# GPU\nGPU_NAME="" VRAM=""\nif command -v nvidia-smi >/dev/null; then\n  LINE=$(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader,nounits 2>/dev/null | head -1)\n  GPU_NAME=${LINE%%,*}; VRAM=$(awk -v m="${LINE##*,}" \'BEGIN{printf "%.1f",m/1024}\')\nelse\n  GPU_NAME=$(lspci 2>/dev/null | grep -iE \'vga|3d|display\' | grep -iE \'amd|ati|radeon|nvidia|arc\' | sed \'s/^[^ ]* //\' | head -1)\n  for f in /sys/class/drm/card*/device/mem_info_vram_total; do\n    [ -r "$f" ] || continue; b=$(cat "$f")\n    [ "$b" -gt 1000000000 ] 2>/dev/null && VRAM=$(awk -v x="$b" \'BEGIN{printf "%.1f",x/1073741824}\')\n  done\nfi\n\n# Ollama\nOLV=$(ollama --version 2>/dev/null | grep -oE \'[0-9]+\\.[0-9]+\\.[0-9]+\' | head -1)\nBACKEND=$(journalctl -u ollama --no-pager 2>/dev/null | grep -oiE \'library=[a-z0-9_]+\' | tail -1 | cut -d= -f2)\nMSIZE="" EVAL="" PEVAL="" PROC=""\nif [ -n "$MODEL" ] && [ -n "$OLV" ]; then\n  log "\u25b6 Messe Ollama-Token-Rate mit $MODEL (l\u00e4dt Modell, kann dauern) \u2026"\n  read -r S U <<<"$(ollama list 2>/dev/null | awk -v m="$MODEL" \'$1==m{print $3, $4}\')"\n  case "${U:-}" in GB) MSIZE=$S;; MB) MSIZE=$(awk -v x="$S" \'BEGIN{printf "%.2f",x/1000}\');; esac\n  ollama run "$MODEL" "Hallo" >/dev/null 2>&1\n  OUT=$(ollama run "$MODEL" --verbose "Erkl\u00e4re in f\u00fcnf S\u00e4tzen, warum Speicherbandbreite die Token-Rate begrenzt." 2>&1 >/dev/null)\n  EVAL=$(printf \'%s\\n\' "$OUT" | sed -n \'s/^eval rate:[[:space:]]*\\([0-9.]*\\).*/\\1/p\' | tail -1)\n  PEVAL=$(printf \'%s\\n\' "$OUT" | sed -n \'s/^prompt eval rate:[[:space:]]*\\([0-9.]*\\).*/\\1/p\' | tail -1)\n  PROC=$(ollama ps 2>/dev/null | awk -v m="$MODEL" \'$1==m{for(i=1;i<=NF;i++) if($i ~ /%/) p=p $i " " $(i+1) " "; print p}\')\nelif [ -n "$MODEL" ]; then\n  log "  Hinweis: Ollama nicht gefunden \u2192 keine Token-Messung."\nfi\n\nprintf \'{"v":1,"host":"%s","os":"%s","board":"%s","cpu":"%s","cpu_cores":%s,"cpu_threads":%s,"cpu_mhz":%s,"cpu_flags":"%s","ram_gb":%s,"ram_type":"%s","ram_mts":%s,"ram_modules":%s,"ram_width":%s,"ram_bw_theory":%s,"ram_bw_measured":%s,"gpu_name":"%s","vram_gb":%s,"ollama":"%s","ollama_backend":"%s","model":"%s","model_size_gb":%s,"eval_tps":%s,"prompt_tps":%s,"ollama_proc":"%s"}\\n\' \\\n  "$(esc "$HOST")" "$(esc "$OS")" "$(esc "$BOARD")" "$(esc "$CPU")" "$(n "$CORES")" "$(n "$THREADS")" "$(n "$MHZ")" "$(esc "$FLAGS")" \\\n  "$(n "$RAM_GB")" "$(esc "$RTYPE")" "$(n "$SPEED")" "$(n "$MODS")" "$(n "$WIDTH")" "$(n "$THEO")" "$(n "$MEAS")" \\\n  "$(esc "$GPU_NAME")" "$(n "$VRAM")" "$(esc "$OLV")" "$(esc "$BACKEND")" "$(esc "$MODEL")" "$(n "$MSIZE")" "$(n "$EVAL")" "$(n "$PEVAL")" "$(esc "$PROC")"\nlog "\u2714 Fertig \u2013 die JSON-Zeile oben in die Seite unter \u201eEigene Ger\u00e4te\u201c einf\u00fcgen."\n';
+        $('dlScript').onclick = () => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(new Blob([HWPROF], { type: 'text/x-sh' }));
+          a.download = 'hw-profil.sh';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            URL.revokeObjectURL(a.href);
+            a.remove();
+          }, 500);
+        };
+        /* The animation only runs while the technical view is visible */
+        let started = false,
+          pausedByView = false;
+        VIEW_HOOKS.toca = {
+          show() {
+            if (!started) {
+              started = true;
+              restart();
+            } else if (pausedByView) {
+              pausedByView = false;
+              setPaused(false);
+            }
+          },
+          hide() {
+            if (started && !paused) {
+              pausedByView = true;
+              setPaused(true);
+            }
+          },
+        };
+        requestAnimationFrame(tick);
+      }
+
+      /* ===== Navigation: start page, #aihow (cost calculator), #toca (technical view), #daten (data view).
+         Sections are named view-…, not like the route: otherwise the browser scrolls to the section on
+         navigation and pushes the header and the data notice out of view. ===== */
+      const VIEWS = {
+        start: 'Eigene KI: Kosten und Hardware verstehen',
+        aihow: 'KI-Kostenrechner – was kostet eigene KI?',
+        toca: 'Wie KI-Hardware arbeitet – Token, Bandbreite, Modelle',
+        daten: 'Datengrundlage – Geräte, Modelle, Preise, Annahmen',
+      };
+      let currentView = null;
+      function route() {
+        const id = location.hash.replace(/^#/, '').split('?')[0];
+        const view = Object.hasOwn(VIEWS, id) ? id : 'start';
+        if (view === currentView) return;
+        showStale(); // a page left open for long can cross the threshold; screen and report stay consistent
+        if (currentView) VIEW_HOOKS[currentView]?.hide?.();
+        currentView = view;
+        document.body.dataset.view = view;
+        for (const v in VIEWS) $('view-' + v).classList.toggle('hidden', v !== view);
+        document.title = VIEWS[view];
+        document.querySelectorAll('header nav a').forEach((a) => a.classList.toggle('on', a.dataset.nav === view));
+        window.scrollTo(0, 0);
+        VIEW_HOOKS[view]?.show?.();
+      }
+      /* ===== Data view: all values with source and date ===== */
+      function srcCell(o) {
+        if (!o || !o.src) return '<td class="q miss">Quelle fehlt</td>';
+        const t = esc(o.src) + (o.date ? ', ' + esc(o.date) : '');
+        return `<td class="q">${o.url ? `<a href="${esc(o.url)}" target="_blank" rel="noopener">${t}</a>` : t}</td>`;
+      }
+      function renderDaten() {
+        const costUse = {};
+        COST_MODELS.forEach((cls, c) => cls.forEach(({ s, v }) => (costUse[s] ??= []).push(`${CLS[c].n} (${v})`)));
+        const rows = (th, trs) => `<table><thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table>`;
+        $('dDevices').innerHTML = rows(
+          '<th>Gerät</th><th>Speicher</th><th class="n">Bandbreite</th><th class="n">Rechenleistung</th><th>Kaufbar als</th><th class="n">Preis</th><th class="n">Last (max.) / Leerlauf</th><th>Quelle Technik</th><th>Quelle Preis</th>',
+          DEVICES.map(
+            (d) =>
+              `<tr><td>${esc(d.name)}${d.est ? ' ≈' : ''}</td><td>${d.cap} GB ${esc(d.mem || '')}${d.spillCap ? ` + ${d.spillCap} GB mit ${d.spillBw} GB/s` : ''}${d.unified && !d.os ? `, nutzbar ${fmt(100 * (d.mac ? 0.75 : d.use), 0)} %` : ''}</td><td class="n">${d.bw.toLocaleString('de-DE')} GB/s</td><td class="n">${fmt(d.tf, d.tf % 1 ? 1 : 0)} TFLOPS FP16${d.tops ? '<br>' + esc(d.tops) : ''}</td><td>${d.sys ? esc(d.sys.n) + '<br><span class="q">' + esc(d.sys.kind) + '</span>' : '–'}</td><td class="n">${d.sys ? eur(d.sys.price) : '–'}</td><td class="n">${d.sys ? `${d.sys.load} W / ${d.sys.idle} W` : '–'}</td>${srcCell(d.spec)}${d.sys ? srcCell(d.sys) : '<td class="q">–</td>'}</tr>`,
+          ).join(''),
+        );
+        $('dDevicesNote').textContent =
+          'Rechenleistung: FP16 ohne Sparsity. Nutzbarer Speicher bei gemeinsamem Speicher: Anteil für die GPU (Mac einstellbar), bei Grafikkarten 1 GB je GPU Abzug. Rechenzentrums-GPUs sind einzeln nicht käuflich und dienen als Mietreferenz.';
+        $('dModels').innerHTML = rows(
+          '<th>Modell</th><th>Gruppe</th><th class="n">Parameter</th><th>Varianten</th><th class="n">Kontext</th><th class="n">KV je Token</th><th>Stufe im Kostenrechner</th><th>Quelle</th>',
+          MODELS.map(
+            (m) =>
+              `<tr><td>${esc(m.name)}${m.tag ? `<br><span class="q">ollama: ${esc(m.tag)}</span>` : ''}</td><td>${esc(m.g)}</td><td class="n">${fmt(m.p, m.p % 1 ? 2 : 0)} B${m.a < m.p ? `<br>${fmt(m.a, m.a % 1 ? 1 : 0)} B aktiv` : ''}</td><td>${m.v.map((v) => `${esc(v.n)}: ${fmt(v.gb, v.gb < 10 ? 2 : 1)} GB${v.est ? ' ≈' : ''}`).join('<br>')}</td><td class="n">${m.maxCtx ? m.maxCtx.toLocaleString('de-DE') : '–'}</td><td class="n">${(m.kv / 1024).toLocaleString('de-DE', { maximumFractionDigits: 0 })} KB${m.kvEst ? ' ≈' : ''}</td><td>${(costUse[m.s] || ['–']).join('<br>')}${m.meas ? `<br><span class="q">Hersteller-Messung ${fmt(m.meas, 2)} Token/s</span>` : ''}</td>${srcCell(m)}</tr>`,
+          ).join(''),
+        );
+        $('dCloud').innerHTML = rows(
+          '<th>Position</th><th class="n">Preis</th><th>Einheit</th><th>Quelle</th>',
+          CLOUD.map(
+            (c) =>
+              `<tr><td>${esc(c.n)}</td><td class="n">${fmt(c.pin, 2)} / ${fmt(c.pout, 2)} ${esc(c.cur)}</td><td>je 1 Mio. Token Eingabe / Ausgabe</td>${srcCell(c)}</tr>`,
+          ).join('') +
+            RENT.map(
+              (r) =>
+                `<tr><td>Miete ${esc(r.n)}</td><td class="n">${fmt(r.usd, 2)} $</td><td>je Stunde, Median on-demand</td>${srcCell(r)}</tr>`,
+            ).join('') +
+            `<tr><td>Online-Dienst, Abo je Arbeitsplatz</td><td class="n">${fmt(SAAS_USD, 2)} $</td><td>je Nutzer und Monat</td>${srcCell(SAAS_SRC)}</tr>`,
+        );
+        const def = (id) => $(id).defaultValue;
+        const A = [
+          [
+            'Praxisabschlag auf die Rechenleistung',
+            fmt(EFF, 2),
+            'Anteil der theoretischen Rechenleistung, der im Betrieb erreichbar ist (beide Ansichten)',
+          ],
+          ['Realitätsfaktor', def('eta'), 'Abschlag auf die theoretische Token-Rate im Kostenrechner; einstellbar'],
+          [
+            'Tempo-Ziel',
+            def('tps') + ' Token/s',
+            'Antwortgeschwindigkeit, die jede Nutzerin und jeder Nutzer mindestens bekommt; einstellbar',
+          ],
+          [
+            'Erste Antwort spätestens',
+            def('ttft') + ' s',
+            'Zeit bis zum ersten Token bei einem typischen Prompt; einstellbar',
+          ],
+          ['Spitzenlast', fmt(PEAK, 1) + '×', 'Anfragen in der Spitzenstunde gegenüber dem Tagesdurchschnitt'],
+          [
+            'Automatische Abläufe',
+            `${AGENT_RPH} Anfragen/h, ${AGENT_P.toLocaleString('de-DE')} Prompt- und ${AGENT_O} Antwort-Tokens`,
+            'je Ablauf, während der Arbeitszeit',
+          ],
+          ['Arbeitszeit', def('hours') + ' h/Tag', 'Stunden, in denen die KI unter Last läuft; einstellbar'],
+          [
+            'Arbeitstage',
+            `${WORKDAYS} je Jahr, ${DAYS_PER_MONTH} je Monat`,
+            'für Strom unter Last und für die Abrechnung nach Nutzung',
+          ],
+          [
+            'Leerlauf',
+            `${HOURS_PER_YEAR.toLocaleString('de-DE')} h/Jahr`,
+            'Geräte laufen rund um die Uhr, außerhalb der Arbeitszeit im Leerlauf',
+          ],
+          ['Strompreis', def('kwh') + ' €/kWh', 'einstellbar'],
+          [
+            'Betrachtungszeitraum',
+            def('yrs') + ' Jahre',
+            'Anschaffung und Strom werden auf diesen Zeitraum verteilt; einstellbar',
+          ],
+          ['Wechselkurs', def('fx') + ' EUR je USD', 'EZB-Referenzkurs 09.10.2026: 1 € = 1,1206 $; einstellbar'],
+          [
+            'Mehrwertsteuer',
+            fmt(100 * (VAT - 1), 0) + ' %',
+            'Online-Dienste, Miete und Abos sind netto angegeben und werden für den Vergleich mit den Bruttopreisen der Hardware erhöht',
+          ],
+          [
+            'Speicherbelegung',
+            fmt(100 * MEM_FILL, 0) + ' %',
+            'höchstens so viel Speicher für Modell und Gesprächsverläufe',
+          ],
+          [
+            'Gesprächsverläufe je Gerät',
+            `bis ${MAX_BATCH.toLocaleString('de-DE')} gleichzeitig`,
+            'Obergrenze der Suche nach gleichzeitigen Anfragen',
+          ],
+          [
+            'Prefill-Kapazität',
+            `${fmt(PREFILL_SLOT, 1)} s je Sekunde`,
+            'wie viel Zeit ein Gerät je Sekunde für erste Antworten aufwenden kann',
+          ],
+          [
+            'Mac-Speicherlimit',
+            `${fmt(100 * +def('macLim'), 0)} %`,
+            'Anteil des gemeinsamen Speichers für die GPU; einstellbar, per sysctl anhebbar',
+          ],
+          [
+            'Testphase',
+            `${TEST_HOURS} Mietstunden`,
+            'vier Wochen auf gemieteter Rechenleistung, Preis aus der Mietreferenz',
+          ],
+          [
+            'Hinweis auf veraltete Daten',
+            `ab ${STALE_MONTHS} Monaten nach dem Datenstand`,
+            'dann nennt jede Ansicht und der Bericht das Alter der Daten',
+          ],
+          [
+            'Überhang je Token',
+            '1 ms, Mehr-GPU 2 bzw. 4 ms',
+            'feste Zeit je Token für Verwaltung und Kommunikation (Technikansicht und Kostenrechner)',
+          ],
+        ];
+        $('dAssume').innerHTML = rows(
+          '<th>Annahme</th><th class="n">Wert</th><th>Bedeutung</th>',
+          A.map(([k, v, d]) => `<tr><td>${esc(k)}</td><td class="n">${esc(v)}</td><td>${esc(d)}</td></tr>`).join(''),
+        );
+      }
+      /* ===== Data date: notice once STAND is at least STALE_MONTHS full months old ===== */
+      function standDate(s = STAND) {
+        const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(s);
+        if (!m) return null;
+        const d = new Date(+m[3], +m[2] - 1, +m[1]);
+        return d.getDate() === +m[1] && d.getMonth() === +m[2] - 1 ? d : null; // 31.02. and the like count as invalid
+      }
+      /** Full months between two dates; negative if the device clock is behind STAND. */
+      function monthsSince(from, now) {
+        return (
+          (now.getFullYear() - from.getFullYear()) * 12 +
+          now.getMonth() -
+          from.getMonth() -
+          (now.getDate() < from.getDate() ? 1 : 0)
+        );
+      }
+      /** Empty text while the data is fresh; otherwise the notice for the header and the report. */
+      function staleText(now = new Date()) {
+        const d = standDate();
+        if (!d) return 'Der Datenstand ist unbekannt. Preise und Modelldaten bitte vor einer Entscheidung prüfen.';
+        const mo = monthsSince(d, now);
+        if (mo < STALE_MONTHS) return '';
+        const age = mo < 24 ? `${mo} Monate` : `${Math.floor(mo / 12)} Jahre`;
+        return `Preise und Modelldaten vom ${STAND}, ${age} alt. Hardwarepreise ändern sich schnell, bitte vor einer Entscheidung prüfen.`;
+      }
+      function showStale() {
+        const t = staleText();
+        $('stale').classList.toggle('hidden', !t);
+        $('stale').innerHTML = t ? `<div class="wrap"><b>Veraltete Daten:</b> ${esc(t)}</div>` : '';
+      }
+      window.addEventListener('hashchange', route);
+      $('stand').textContent = STAND;
+      renderDaten();
+      route();
+    </script>
+  </body>
+</html>

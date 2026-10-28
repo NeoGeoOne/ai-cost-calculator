@@ -1,0 +1,39 @@
+name: Data correction
+description: A price is outdated, or a device or model is missing or wrong.
+labels: [data]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - Price outdated
+        - Device missing or wrong
+        - Model missing or wrong
+        - Cloud or subscription tariff
+    validations:
+      required: true
+  - type: input
+    id: item
+    attributes:
+      label: Device, model or tariff
+    validations:
+      required: true
+  - type: input
+    id: value
+    attributes:
+      label: Correct value
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source (public link)
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Date of the source (YYYY-MM-DD)
+    validations:
+      required: true
